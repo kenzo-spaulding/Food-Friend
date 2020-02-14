@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.time.format.TextStyle;
 import java.util.Arrays;
 import java.util.List;
+import com.example.foodie_friend.frontend.dependencies.SleepTimer;
 
 public class MainActivity extends AppCompatActivity {
     Button mTest;
@@ -47,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
         zTest = (Button) findViewById(R.id.but);
         mTest = (Button) findViewById(R.id.test);
         mFirebaseAuth = FirebaseAuth.getInstance();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
+        SleepTimer.delay(3, pair);
     }
 
 
