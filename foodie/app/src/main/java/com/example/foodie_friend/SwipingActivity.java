@@ -96,7 +96,7 @@ public class SwipingActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, MapsActivity.class);
         Pair<SwipingActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(5, pair);
+        SleepTimer.delay(pair);
     }
 }
 

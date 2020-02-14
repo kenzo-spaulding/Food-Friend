@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, LoginActivity.class);
         Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(3, pair);
+        SleepTimer.delay(pair);
     }
 
 

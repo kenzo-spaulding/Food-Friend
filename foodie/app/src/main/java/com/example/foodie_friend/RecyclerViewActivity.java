@@ -406,7 +406,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, SwipingActivity.class);
         Pair<RecyclerViewActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(5, pair);
+        SleepTimer.delay(pair);
     }
 
     private void startListView(){

@@ -21,8 +21,13 @@ import com.example.foodie_friend.SwipingActivity;
 
 public class SleepTimer {
 
+    public static void delay(Object o){
+        int seconds = 2;
+        delay(seconds, o);
+    }
+
     public static void delay(int seconds, Object o){
-        if (o instanceof TextView){
+        if (o instanceof TextView || o instanceof EditText){
             delay(seconds, (TextView) o);
         }
         else if (o instanceof EditText){
@@ -33,12 +38,6 @@ public class SleepTimer {
         }
         else if (o instanceof AtomicLong){
             delay(seconds, (AtomicLong) o);
-        }
-        else if (o instanceof AppCompatActivity) {
-            Pair<Object, Intent> pair = (Pair)o;
-            final Object activity = pair.first;
-            final Intent intent = pair.second;
-            Toast.makeText(((AppCompatActivity)activity), "Clicked!", Toast.LENGTH_SHORT).show();
         }
         else if (o instanceof Pair){
             Pair<Object, Intent> pair = (Pair)o;

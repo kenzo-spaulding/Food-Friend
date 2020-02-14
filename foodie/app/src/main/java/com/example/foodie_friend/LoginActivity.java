@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity{
 
         Intent intent = new Intent(this, RecyclerViewActivity.class);
         Pair<LoginActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(5, pair);
+        SleepTimer.delay(pair);
     }
 
 
