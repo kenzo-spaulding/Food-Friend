@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.foodie_friend.frontend.dependencies.FirebaseFunctions;
+import com.example.foodie_friend.frontend.dependencies.GoogleFunctions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,13 +30,9 @@ import java.util.List;
 import com.example.foodie_friend.frontend.dependencies.SleepTimer;
 
 public class MainActivity extends AppCompatActivity {
-    Button mTest;
-    Button zTest;
-    TextView tTest;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
-    public static final int RC_SIGN_IN = 1;
 
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mConditionRef = mRootRef.child("test1");
@@ -44,70 +42,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        tTest = (TextView) findViewById(R.id.word);
-        zTest = (Button) findViewById(R.id.but);
-        mTest = (Button) findViewById(R.id.test);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(3, pair);
+        //Intent intent = new Intent(this, LoginActivity.class);
+        //Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
+        //SleepTimer.delay(3, pair);
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
+        FirebaseFunctions.addMConditionRefListeners(mConditionRef);
+        mAuthStateListener = GoogleFunctions.startLogin(this);
 
-        mConditionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String text = dataSnapshot.getValue(String.class);
-                tTest.setText(text);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-
-        });
-
-
-        mTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mConditionRef.setValue("Changed!");
-            }
-        });
-
-        zTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mConditionRef.setValue("Chips!");
-            }
-        });
-
-
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    Toast.makeText(MainActivity.this, "hi!", Toast.LENGTH_SHORT).show();
-                } else {
-                    startActivityForResult(
-                        AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(Arrays.asList(
-                                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                new AuthUI.IdpConfig.EmailBuilder().build()))
-                            .build(),
-                        RC_SIGN_IN);
-                }
-            }
-        };
 
     }
 
