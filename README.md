@@ -1,4 +1,42 @@
 # Wellness-Advisor-Mobile-App
 
-We can fill this in later. I made an abitrary file in the design artifacts to force github to stage and push the folder itself. 
-We can put photos of our whiteboarding there later. 
+# 1. MainActivity
+
+
+Runs the UI and connects to FireBase
+
+**onCreate(**_savedInstanceState_**)**
+Initializes mFirebaseAuth with FireBase
+
+
+**onStart()** - its the function when the app starts
+mConditionRef.addValueEventListener
+    gets a string from FireBase
+
+
+mAuthStateListener: this is our listener for logging in
+
+new FirebaseAuth.AuthStateListener() {
+public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+    Checks if the current authorization has changed to either
+    access denied or access granted.
+
+
+FirebaseUser user;
+- if user is null then no access, else you're in and can access all
+the information
+
+- user's functions
+    user.getEmail()
+    user.getName()
+    ....
+
+**onPause()** - its the function when the app is paused
+super.onPause();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+
+
+
+**onResume()** - its the function when the app is resumed
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
