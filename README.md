@@ -2,8 +2,10 @@
 
 # 1. MainActivity
 
-
-Runs the UI and connects to FireBase
+FirebaseAuth mFirebaseAuth;
+- is our Firebase
+DatabaseReference mConditionRef = mRootRef.child("test1");
+- Connects to the document called "test1"
 
 **onCreate(**_savedInstanceState_**)**
 Initializes mFirebaseAuth with FireBase
