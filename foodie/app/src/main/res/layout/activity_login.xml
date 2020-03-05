@@ -87,7 +87,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
         android:text="New Account"
-        app:layout_constraintBottom_toTopOf="@+id/Button_Create_Account"
+        app:layout_constraintBottom_toTopOf="@+id/button_Create_Account"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Button_Sign_In" />
@@ -101,7 +101,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.199"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Button_Create_Account" />
+        app:layout_constraintTop_toBottomOf="@+id/button_Create_Account" />
 
     <TextView
         android:id="@+id/TextView_Forgot_Password"
@@ -115,11 +115,12 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <CheckBox
-        android:id="@+id/CheckBox_Show_Password"
+        android:id="@+id/checkBox_Show_Password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:buttonTint="#696969"
+        android:onClick="onClick_ShowPassword"
         android:text="Show password"
         android:textColor="#FF696969"
         app:layout_constraintEnd_toEndOf="parent"
@@ -128,17 +129,19 @@
         app:layout_constraintTop_toBottomOf="@+id/EditText_Password" />
 
     <CheckBox
-        android:id="@+id/CheckBox_Keep_Signed_In"
+        android:id="@+id/checkBox_Keep_Signed_In"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="4dp"
         android:buttonTint="#696969"
+        android:checked="false"
+        android:onClick="onClick_SetKeepMeSignedIn"
         android:text="Keep me signed in"
         android:textColor="#FF696969"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.178"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CheckBox_Show_Password" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_Show_Password" />
 
     <Button
         android:id="@+id/Button_Sign_In"
@@ -146,19 +149,21 @@
         android:layout_height="51dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/ic_login_grey_button"
+        android:onClick="onClick_SignIn"
         android:text="Sign in"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CheckBox_Keep_Signed_In" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_Keep_Signed_In" />
 
     <Button
-        android:id="@+id/Button_Create_Account"
+        android:id="@+id/button_Create_Account"
         android:layout_width="314dp"
         android:layout_height="51dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/ic_login_grey_button"
+        android:onClick="onClick_CreateNewAccount"
         android:text="Create new account"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
@@ -166,16 +171,16 @@
         app:layout_constraintTop_toBottomOf="@+id/Button_Sign_In" />
 
     <TextView
-        android:id="@+id/TextView_Indicator"
+        android:id="@+id/textView_Indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:textColor="#FF0000"
-        android:textSize="24sp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/Button_Sign_In"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CheckBox_Keep_Signed_In" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_Keep_Signed_In" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

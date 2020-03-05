@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.foodie_friend.frontend.dependencies.FirebaseFunctions;
 import com.example.foodie_friend.frontend.dependencies.GoogleFunctions;
+import com.example.foodie_friend.ui.login.SignInActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,19 +43,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mFirebaseAuth = FirebaseAuth.getInstance();
+        //mFirebaseAuth = FirebaseAuth.getInstance();
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(3, pair);
+        Intent intent = new Intent(this, SignInActivity.class);
+        //Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
+        //SleepTimer.delay(3, pair);
+        this.startActivity(intent);
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseFunctions.addMConditionRefListeners(mConditionRef);
-        mAuthStateListener = GoogleFunctions.startLogin(this);
+        //FirebaseFunctions.addMConditionRefListeners(mConditionRef);
+        //mAuthStateListener = GoogleFunctions.startLogin(this);
 
 
     }
@@ -62,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        //mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        //mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
 
