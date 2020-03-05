@@ -17,6 +17,7 @@ import com.example.foodie_friend.MainActivity;
 import com.example.foodie_friend.MapsActivity;
 import com.example.foodie_friend.RecyclerViewActivity;
 import com.example.foodie_friend.SwipingActivity;
+import com.example.foodie_friend.ui.login.SignInActivity;
 
 public class SleepTimer {
 
@@ -55,8 +56,8 @@ public class SleepTimer {
     private static void startActivity(Object o, Intent intent) {
         if (o instanceof MainActivity)
             ((MainActivity) o).startActivity(intent);
-        if (o instanceof LoginActivity)
-            ((LoginActivity) o).startActivity(intent);
+        if (o instanceof SignInActivity)
+            ((SignInActivity) o).startActivity(intent);
         else if (o instanceof RecyclerViewActivity)
             ((RecyclerViewActivity) o).startActivity(intent);
         else if (o instanceof MapsActivity)
@@ -109,7 +110,7 @@ public class SleepTimer {
         }
     }
 
-    public static void delay(final int seconds, final LoginActivity login, final RecyclerViewActivity list){
+    public static void delay(final int seconds, final SignInActivity login, final RecyclerViewActivity list){
         int timer = 0;
         for (int i = seconds; i >= 0; i--){
             timer += 1000;
