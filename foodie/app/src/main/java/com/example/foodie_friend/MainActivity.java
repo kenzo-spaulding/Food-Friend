@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         Intent intent = new Intent(this, SignInActivity.class);
         //Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //FirebaseFunctions.addMConditionRefListeners(mConditionRef);
-        //mAuthStateListener = GoogleFunctions.startLogin(this);
+        FirebaseFunctions.addMConditionRefListeners(mConditionRef);
+        mAuthStateListener = GoogleFunctions.startLogin(this);
 
 
     }

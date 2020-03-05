@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.example.foodie_friend.LoginActivity;
 import com.example.foodie_friend.MainActivity;
 import com.example.foodie_friend.MapsActivity;
 import com.example.foodie_friend.RecyclerViewActivity;
