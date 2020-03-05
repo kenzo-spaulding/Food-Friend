@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity{
         username = (EditText) findViewById(R.id.EditText_Username);
         password = (EditText) findViewById(R.id.EditText_Password);
         indicator = (TextView) findViewById(R.id.TextView_Indicator);
-        login = (Button) findViewById(R.id.Button_Login);
+        login = (Button) findViewById(R.id.Button_Sign_In);
 
         username.setText(hidden_username);
         password.setText(hidden_password);

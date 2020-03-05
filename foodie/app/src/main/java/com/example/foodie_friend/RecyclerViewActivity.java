@@ -1,26 +1,21 @@
 package com.example.foodie_friend;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.example.foodie_friend.frontend.dependencies.SleepTimer;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -59,8 +54,8 @@ class RecyclerViewAdapter extends
             // to access the context from any ViewHolder instance.
             super(itemView);
 
-            nameTextView = (TextView) itemView.findViewById(R.id.contact_name);
-            messageButton = (Button) itemView.findViewById(R.id.message_button);
+            nameTextView = (TextView) itemView.findViewById(R.id.textview_text);
+            //messageButton = (Button) itemView.findViewById(R.id.message_button);
         }
     }
 
@@ -95,9 +90,9 @@ class RecyclerViewAdapter extends
         // Set item_swipe views based on your views and data model
         TextView textView = viewHolder.nameTextView;
         textView.setText(contact.getName());
-        Button button = viewHolder.messageButton;
-        button.setText(contact.isOnline() ? "Visit" : "Closed");
-        button.setEnabled(contact.isOnline());
+        //Button button = viewHolder.messageButton;
+        //button.setText(contact.isOnline() ? "Visit" : "Closed");
+        //button.setEnabled(contact.isOnline());
     }
 
     // Returns the total count of items in the list
@@ -128,6 +123,12 @@ class Contact {
 
 
     public static ArrayList<Contact> createContactsList(int numContacts) {
+        String temp = "https://logo.clearbit.com/.com";
+
+        ArrayList<String> companyLogo = new ArrayList<>(Arrays.asList(
+                "https://logo.clearbit.com/innout.com",
+                "https://logo.clearbit.com/.com"
+        ));
         ArrayList<String> mylist = new ArrayList<>(Arrays.asList(
                 "Parallel 37",
                 "Starbelly",
