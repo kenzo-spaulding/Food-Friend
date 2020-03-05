@@ -56,7 +56,6 @@
         android:imeOptions="actionDone"
         android:inputType="text|textPassword"
         android:selectAllOnFocus="true"
-        android:text="jljlj;jkl;jkj;ljk"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="parent"
