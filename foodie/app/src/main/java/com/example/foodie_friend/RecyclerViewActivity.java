@@ -1,6 +1,7 @@
 package com.example.foodie_friend;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,17 +15,34 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.example.foodie_friend.frontend.dependencies.SleepTimer;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 // Create the basic adapter extending from RecyclerView.Adapter
 // Note that we specify the custom ViewHolder which gives us access to our views
-class ContactsAdapter extends
-        RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
+class RecyclerViewAdapter extends
+        RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+
+    /* need to do this everywhere we refer the database
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+
+    public void deleteItem(){
+        StoreItem s (StoreItem)list.get(position);
+        String key = s.getKey();
+        myRef.child(key).removeValue();
+        list.remove(position);
+        notifyDataSetChanged();
+    }
+    *///end of database code
+
 
     // Provide a direct reference to each of the views within a data item_swipe
     // Used to cache the views within the item_swipe layout for fast access
@@ -50,13 +68,13 @@ class ContactsAdapter extends
     private List<Contact> mContacts;
 
     // Pass in the contact array into the constructor
-    public ContactsAdapter(List<Contact> contacts) {
+    public RecyclerViewAdapter(List<Contact> contacts) {
         mContacts = contacts;
     }
 
     // Usually involves inflating a layout from XML and returning the holder
     @Override
-    public ContactsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
@@ -70,7 +88,7 @@ class ContactsAdapter extends
 
     // Involves populating data into the item_swipe through holder
     @Override
-    public void onBindViewHolder(ContactsAdapter.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(RecyclerViewAdapter.ViewHolder viewHolder, int position) {
         // Get the data model based on position
         Contact contact = mContacts.get(position);
 
@@ -395,6 +413,10 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
     ArrayList<Contact> contacts;
 
+    // Firebase variables
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -402,11 +424,24 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
         startListView();
 
+        // connecting list to firebase NOTE: scroll down and click on real time database & select test mode
+        //ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDelete((ItemViewAdapter) adapter));
+        //itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        //Intent intent = new Intent(this, SwipingActivity.class);
+        //Pair<RecyclerViewActivity, Intent> pair = new Pair<>(this, intent);
+        //SleepTimer.delay(5, pair);
 
 
-        Intent intent = new Intent(this, SwipingActivity.class);
-        Pair<RecyclerViewActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(5, pair);
+        // Firebase: must do these in order
+        //database = FirebaseDatabase.getInstance();
+        //myRef = database.getReference("Items"); // gets the branch called Item from your DB
+        // note if it doesn't exist, Firebase will create it.
+        // Your database needs a unique key, else it will be overrided
+        //String key = myRef.push().getKey(); // generates a random key for us
+        //myRef.child(key).setValue("My db has this as a value");
+        // on friday we will go over updating the recycler view
+
     }
 
     private void startListView(){
@@ -417,7 +452,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
         // Initialize contacts
         contacts = Contact.createContactsList(20);
         // Create adapter passing in the sample user data
-        ContactsAdapter adapter = new ContactsAdapter(contacts);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(contacts);
         // Attach the adapter to the recyclerview to populate items
         rvContacts.setAdapter(adapter);
         // Set layout manager to position the items

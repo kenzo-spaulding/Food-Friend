@@ -1,0 +1,66 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1920dp"
+    android:height="1080dp"
+    android:viewportWidth="1920"
+    android:viewportHeight="1080">
+
+  <!-- blue button -->
+  <path
+      android:pathData="M215.25,929.1h410.71v74h-410.71z"
+      android:fillColor="#555EFF"/>
+
+  <!-- white box under G for google -->
+  <path
+      android:pathData="M278.95,1001.39h-52.44c-5.18,0 -9.37,-4.2 -9.37,-9.37v-52.44c0,-5.18 4.2,-9.37 9.37,-9.37h52.44c5.18,0 9.37,4.2 9.37,9.37v52.44C288.32,997.2 284.12,1001.39 278.95,1001.39z"
+      android:fillColor="#FFFFFF"/>
+
+
+  <!-- G - in google  -->
+  <path
+      android:pathData="M281.11,965.28c0.13,-1.85 0.12,-3.71 -0.07,-5.55l-25.6,-1.83l-0.75,10.45l14.66,1.05c-0.85,3.33 -3.02,6.17 -6.02,7.86l-0.49,6.78l8.75,0.63C277.07,980.31 280.52,973.54 281.11,965.28z"
+      android:fillColor="#4285F4"/>
+  <path
+      android:pathData="M253.14,989.94c7.32,0.52 13.67,-1.44 18.46,-5.27l-8.26,-7.41c-2.55,1.48 -5.76,2.19 -9.42,1.93c-7.08,-0.51 -12.74,-5.72 -14.44,-12.29l-9.03,-0.65l-0.5,6.99C233.9,982.75 242.88,989.2 253.14,989.94z"
+      android:fillColor="#34A853"/>
+  <path
+      android:pathData="M239.47,966.9c-0.9,-3.45 -0.63,-7.1 0.74,-10.39l0.5,-6.99l-9.02,-0.64c-4.4,7.39 -5.05,16.43 -1.74,24.38L239.47,966.9z"
+      android:fillColor="#FBBC04"/>
+  <path
+      android:pathData="M256.26,946.39c3.87,0.22 7.51,1.94 10.12,4.81l0,0l8.31,-7.2c-4.58,-4.96 -10.91,-7.96 -17.66,-8.36c-10.26,-0.73 -20.06,4.38 -25.33,13.23l8.52,7.64C242.82,950.23 249.18,945.88 256.26,946.39z"
+      android:fillColor="#EA4335"/>
+
+  <!-- grey buttons -->
+  <path
+      android:pathData="M224.35,686.57h478.83v47.93h-478.83z"
+      android:fillColor="#7C7C87"/>
+  <path
+      android:pathData="M224.35,798.21h474.06v47.93h-474.06z"
+      android:fillColor="#7C7C87"/>
+
+  <!-- Input text boxes -->
+  <path
+      android:strokeWidth="1"
+      android:pathData="M225.62,414.83h482.28v43.04h-482.28z"
+      android:fillColor="#FFFFFF"
+      android:strokeColor="#B3B3B3"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M225.62,471.8h482.28v43.04h-482.28z"
+      android:fillColor="#FFFFFF"
+      android:strokeColor="#B3B3B3"/>
+
+  <!-- checkboxes -->
+  <path
+      android:strokeWidth="1"
+      android:pathData="M224.35,553.76h36.08v36.08h-36.08z"
+      android:fillColor="#FFFFFF"
+      android:strokeColor="#B3B3B3"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M224.35,608.49h36.08v36.08h-36.08z"
+      android:fillColor="#FFFFFF"
+      android:strokeColor="#B3B3B3"/>
+
+
+
+</vector>

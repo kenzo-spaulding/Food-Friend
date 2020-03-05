@@ -44,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        //Intent intent = new Intent(this, LoginActivity.class);
-        //Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
-        //SleepTimer.delay(3, pair);
+        Intent intent = new Intent(this, RecyclerViewActivity.class);
+        Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
+        SleepTimer.delay(3, pair);
     }
 
 
