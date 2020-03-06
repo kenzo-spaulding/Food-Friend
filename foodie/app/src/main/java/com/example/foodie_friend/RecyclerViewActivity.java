@@ -5,6 +5,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,118 +26,77 @@ import java.util.List;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.w3c.dom.Text;
 
-// Create the basic adapter extending from RecyclerView.Adapter
-// Note that we specify the custom ViewHolder which gives us access to our views
-class RecyclerViewAdapter extends
-        RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+// Downloads the image from the url
+class DownloadImage extends AsyncTask<String, Void, Bitmap> {
+    ImageView bitMap;
 
-    /* need to do this everywhere we refer the database
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
-
-    public void deleteItem(){
-        StoreItem s (StoreItem)list.get(position);
-        String key = s.getKey();
-        myRef.child(key).removeValue();
-        list.remove(position);
-        notifyDataSetChanged();
+    public DownloadImage(ImageView bitMap){
+        this.bitMap = bitMap;
     }
-    *///end of database code
 
-
-    // Provide a direct reference to each of the views within a data item_swipe
-    // Used to cache the views within the item_swipe layout for fast access
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        // Your holder should contain a member variable
-        // for any view that will be set as you render a row
-        public TextView nameTextView;
-        public ImageView image;
-        public Button messageButton;
-
-        // We also create a constructor that accepts the entire item_swipe row
-        // and does the view lookups to find each subview
-        public ViewHolder(View itemView) {
-            // Stores the itemView in a public final member variable that can be used
-            // to access the context from any ViewHolder instance.
-            super(itemView);
-
-            nameTextView = (TextView) itemView.findViewById(R.id.textView_FoodName);
-            image = (ImageView) itemView.findViewById(R.id.imageview_Background);
-            //messageButton = (Button) itemView.findViewById(R.id.message_button);
+    @Override
+    protected Bitmap doInBackground(String... urls) {
+        String urls_to_display = urls[0];
+        Bitmap connect = null;
+        try{
+            InputStream in = new java.net.URL(urls_to_display).openStream();
+            connect = BitmapFactory.decodeStream(in);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return connect;
     }
 
-    // Store a member variable for the contacts
-    private List<Contact> mContacts;
-
-    // Pass in the contact array into the constructor
-    public RecyclerViewAdapter(List<Contact> contacts) {
-        mContacts = contacts;
-    }
-
-    // Usually involves inflating a layout from XML and returning the holder
-    @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
-
-        // Inflate the custom layout
-        View contactView = inflater.inflate(R.layout.list_content, parent, false);
-
-        // Return a new holder instance
-        ViewHolder viewHolder = new ViewHolder(contactView);
-        return viewHolder;
-    }
-
-    // Involves populating data into the item_swipe through holder
-    @Override
-    public void onBindViewHolder(RecyclerViewAdapter.ViewHolder viewHolder, int position) {
-        // Get the data model based on position
-        Contact contact = mContacts.get(position);
-
-        // Set item_swipe views based on your views and data model
-        TextView textView = viewHolder.nameTextView;
-        textView.setText(contact.getName());
-        //Button button = viewHolder.messageButton;
-        //button.setText(contact.isOnline() ? "Visit" : "Closed");
-        //button.setEnabled(contact.isOnline());
-    }
-
-    // Returns the total count of items in the list
-    @Override
-    public int getItemCount() {
-        return mContacts.size();
+    protected void onPostExecute(Bitmap map){
+        bitMap.setImageBitmap(map);
     }
 }
 
+//Item content organized
 class Contact {
-    private String mName;
-    private boolean mOnline;
+    private String logo_url = "https://logo.clearbit.com/innout.com";
+    private String foodName;
+    private String foodSize;
+    private String foodMods;
+    private String drinkName;
+    private String drinkSize;
+    private String drinkMods;
 
-    public Contact(String name, boolean online) {
-        mName = name;
-        mOnline = online;
+    public ArrayList<String> companyLogo = new ArrayList<>(Arrays.asList(
+            "https://logo.clearbit.com/innout.com",
+            "https://logo.clearbit.com/.com"
+    ));
+
+    public Contact(String logo_url, String foodName, String foodSize, String foodMods, String drinkName, String drinkSize, String drinkMods) {
+        this.logo_url = logo_url;
+        this.foodName = foodName;
+        this.foodSize = foodSize;
+        this.foodMods = foodMods;
+        this.drinkName = drinkName;
+        this.drinkSize = drinkSize;
+        this.drinkMods = drinkMods;
     }
 
-    public String getName() {
-        return mName;
+    public Contact(String foodName) {
+        this.foodName = foodName;
     }
 
-    public boolean isOnline() {
-        return mOnline;
+    public Contact(String foodName, String drinkName) {
+        this.foodName = foodName;
+        this.drinkName = drinkName;
     }
 
-    private static int lastContactId = 0;
+    public String getFoodName() {
+        return foodName;
+    }
 
+    public String getLogoURL(){ return logo_url; }
 
-    public static ArrayList<Contact> createContactsList(int numContacts) {
-        String temp = "https://logo.clearbit.com/.com";
-
-        ArrayList<String> companyLogo = new ArrayList<>(Arrays.asList(
-                "https://logo.clearbit.com/innout.com",
-                "https://logo.clearbit.com/.com"
-        ));
+    public static ArrayList<Contact> createContactsList() {
         ArrayList<String> mylist = new ArrayList<>(Arrays.asList(
                 "Parallel 37",
                 "Starbelly",
@@ -397,12 +362,11 @@ class Contact {
                 "Waterfront Restaurant",
                 "World Famous"
         ));
-        ArrayList<Contact> contacts = new ArrayList<Contact>();
+        ArrayList<Contact> contacts = new ArrayList<>();
 
         for (int i = 1; i < mylist.size(); i++) {
-            contacts.add(new Contact(mylist.get(i), i <= numContacts / 2));
+            contacts.add(new Contact(mylist.get(i)));
         }
-
         return contacts;
     }
 
@@ -410,6 +374,100 @@ class Contact {
 
     }
 
+}
+
+
+// Create the basic adapter extending from RecyclerView.Adapter
+// Note that we specify the custom ViewHolder which gives us access to our views
+class RecyclerViewAdapter extends
+        RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+
+    /* need to do this everywhere we refer the database
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+
+    public void deleteItem(){
+        StoreItem s (StoreItem)list.get(position);
+        String key = s.getKey();
+        myRef.child(key).removeValue();
+        list.remove(position);
+        notifyDataSetChanged();
+    }
+    *///end of database code
+
+
+    // Provide a direct reference to each of the views within a data item_swipe
+    // Used to cache the views within the item_swipe layout for fast access
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        // Your holder should contain a member variable
+        // for any view that will be set as you render a row
+        protected ImageView imageView_logo;
+        protected TextView textView_FoodName;
+        protected TextView textView_FoodSize;
+        protected TextView textView_FoodMods;
+        protected TextView textView_DrinkName;
+        protected TextView textView_DrinkSize;
+        protected TextView textView_DrinkMods;
+
+        // We also create a constructor that accepts the entire item_swipe row
+        // and does the view lookups to find each subview
+        public ViewHolder(View itemView) {
+            // Stores the itemView in a public final member variable that can be used
+            // to access the context from any ViewHolder instance.
+            super(itemView);
+
+            imageView_logo = (ImageView) itemView.findViewById(R.id.imageview_CompanyLogo);
+            textView_FoodName = (TextView) itemView.findViewById(R.id.textView_FoodName);
+            textView_FoodSize = (TextView) itemView.findViewById(R.id.textView_FoodSize);
+            textView_FoodMods = (TextView) itemView.findViewById(R.id.textView_FoodMods);
+            textView_DrinkName = (TextView) itemView.findViewById(R.id.textView_DrinkName);
+            textView_DrinkSize = (TextView) itemView.findViewById(R.id.textView_DrinkSize);
+            textView_DrinkMods = (TextView) itemView.findViewById(R.id.textView_FoodMods);
+        }
+    }
+
+    // Store a member variable for the contacts
+    private List<Contact> mContacts;
+
+    // Pass in the contact array into the constructor
+    public RecyclerViewAdapter(List<Contact> contacts) {
+        mContacts = contacts;
+    }
+
+    // Usually involves inflating a layout from XML and returning the holder
+    @Override
+    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+
+        // Inflate the custom layout
+        View contactView = inflater.inflate(R.layout.list_content, parent, false);
+
+        // Return a new holder instance
+        ViewHolder viewHolder = new ViewHolder(contactView);
+        return viewHolder;
+    }
+
+    // Involves populating data into the item_swipe through holder
+    @Override
+    public void onBindViewHolder(RecyclerViewAdapter.ViewHolder viewHolder, int position) {
+        // Get the data model based on position
+        Contact contact = mContacts.get(position);
+
+        // Set item_swipe views based on your views and data model
+        viewHolder.textView_FoodName.setText(contact.getFoodName());
+        new DownloadImage((ImageView) viewHolder.imageView_logo).execute(contact.getLogoURL());
+
+        //Button button = viewHolder.messageButton;
+        //button.setText(contact.isOnline() ? "Visit" : "Closed");
+        //button.setEnabled(contact.isOnline());
+    }
+
+    // Returns the total count of items in the list
+    @Override
+    public int getItemCount() {
+        return mContacts.size();
+    }
 }
 
 
@@ -454,7 +512,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
         RecyclerView rvContacts = (RecyclerView) findViewById(R.id.rvContacts);
 
         // Initialize contacts
-        contacts = Contact.createContactsList(20);
+        contacts = Contact.createContactsList();
         // Create adapter passing in the sample user data
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(contacts);
         // Attach the adapter to the recyclerview to populate items
