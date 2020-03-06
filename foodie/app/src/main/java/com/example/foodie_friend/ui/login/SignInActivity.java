@@ -92,12 +92,9 @@ public class SignInActivity extends AppCompatActivity {
                 }
                 if (loginResult.getSuccess() != null) {
                     updateUiWithUser(loginResult.getSuccess());
-                    finish();
+                    finish(); // closes the activity when done
                 }
                 setResult(Activity.RESULT_OK);
-
-                //TODO: This completes and destroy login activity once successful
-                //finish();
             }
         });
 
