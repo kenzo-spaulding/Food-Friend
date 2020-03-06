@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         app:cardCornerRadius="4dp"
-        android:elevation="2dp"
-        android:id="@+id/cardView">
+        android:elevation="2dp">
 
         <FrameLayout
             android:layout_gravity="center"
@@ -35,7 +34,6 @@
                 tools:text="Card_View" />
 
             <View
-                android:id="@+id/item_swipe_left_indicator"
                 android:alpha="0"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -44,7 +42,6 @@
                 android:layout_gravity="left"/>
 
             <View
-                android:id="@+id/item_swipe_right_indicator"
                 android:alpha="0"
                 android:layout_width="20dp"
                 android:layout_height="20dp"

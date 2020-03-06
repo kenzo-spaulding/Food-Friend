@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ class RecyclerViewAdapter extends
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
         public TextView nameTextView;
+        public ImageView image;
         public Button messageButton;
 
         // We also create a constructor that accepts the entire item_swipe row
@@ -54,7 +56,8 @@ class RecyclerViewAdapter extends
             // to access the context from any ViewHolder instance.
             super(itemView);
 
-            nameTextView = (TextView) itemView.findViewById(R.id.textview_text);
+            nameTextView = (TextView) itemView.findViewById(R.id.textView_FoodName);
+            image = (ImageView) itemView.findViewById(R.id.imageview_Background);
             //messageButton = (Button) itemView.findViewById(R.id.message_button);
         }
     }
