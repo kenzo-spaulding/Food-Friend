@@ -51,7 +51,6 @@ public class SignInActivity extends AppCompatActivity {
         usernameEditText = (EditText) findViewById(R.id.username);
         passwordEditText = (EditText) findViewById(R.id.password);
         usernameEditText.setText("anteater");
-        passwordEditText.setText("zotzot");
         loginButton = (Button) findViewById(R.id.login);
         createAccount = (Button) findViewById(R.id.button_Create_Account);
         loadingProgressBar = (ProgressBar) findViewById(R.id.loading);
