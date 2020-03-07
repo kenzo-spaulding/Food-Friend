@@ -1,5 +1,11 @@
 package com.example.foodie_friend;
 
+/**
+ * Nutrition API
+ * https://developer.nutritionix.com/docs/v1_1
+ * https://api.spoonacular.com/recipes/search
+ *
+ */
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -45,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        Intent intent = new Intent(this, SignInActivity.class);
+        Intent intent = new Intent(this, SwipingActivity.class);
         //Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
         //SleepTimer.delay(3, pair);
         this.startActivity(intent);

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
@@ -14,30 +15,50 @@ import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import java.util.ArrayList;
 
 import com.example.foodie_friend.frontend.dependencies.SleepTimer;
+import com.example.foodie_friend.frontend.dependencies.DownloadImage;
+
+class ImageContent{
+    private String name;
+    private String url;
+    public ImageContent(String name, String url){
+        this.name = name;
+        this.url = url;
+    }
+    void setImage(ImageView imageView){
+        new DownloadImage((ImageView) imageView).execute(url);
+    }
+    public String getName() {
+        return name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+}
+
 
 public class SwipingActivity extends AppCompatActivity {
 
-    private ArrayList<String> al;
-    private ArrayAdapter<String> arrayAdapter;
+    private ArrayList<ImageContent> imageContents;
+    private ArrayAdapter<ImageContent> arrayAdapter;
     private int i;
-
+    private ImageView image;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swiping);
 
+        imageContents = new ArrayList<>();
+        imageContents.add(new ImageContent("Chicken", "https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new ImageContent("Burgers", "https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new ImageContent("Pizza", "https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new ImageContent("Salads","https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new ImageContent("Cajun","https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new ImageContent("Pasta", "https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new ImageContent("Seafood", "https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new ImageContent("Vegan", "https://logo.clearbit.com/mcdonalds.com"));
 
-        al = new ArrayList<>();
-        al.add("Chicken");
-        al.add("Burgers");
-        al.add("Pizza");
-        al.add("Salads");
-        al.add("Cajun");
-        al.add("Pasta");
-        al.add("Seafood");
-        al.add("Vegan");
-
-        arrayAdapter = new ArrayAdapter<>(this, R.layout.item_swipe, R.id.helloText, al );
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.item_swipe, R.id.textView_card, imageContents );
 
         SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
 
@@ -47,7 +68,7 @@ public class SwipingActivity extends AppCompatActivity {
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
-                al.remove(0);
+                imageContents.remove(0);
                 arrayAdapter.notifyDataSetChanged();
             }
 
@@ -67,7 +88,7 @@ public class SwipingActivity extends AppCompatActivity {
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
-                al.add("Food item: ".concat(String.valueOf(i)));
+                imageContents.add(new ImageContent("Food item: ".concat(String.valueOf(i)), "https://logo.clearbit.com/mcdonalds.com"));
                 arrayAdapter.notifyDataSetChanged();
                 Log.d("LIST", "notified");
                 i++;
