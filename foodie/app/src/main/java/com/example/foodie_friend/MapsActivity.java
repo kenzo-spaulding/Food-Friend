@@ -2,8 +2,11 @@ package com.example.foodie_friend;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Pair;
 
+import com.example.foodie_friend.frontend.dependencies.SleepTimer;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,6 +26,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragmentmap);
         mapFragment.getMapAsync(this);
+
+        Intent intent = new Intent(this, SwipingActivity.class);
+        Pair<MapsActivity, Intent> pair = new Pair<>(this, intent);
+        SleepTimer.delay(5, pair);
     }
 
 

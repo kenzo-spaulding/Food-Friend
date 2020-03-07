@@ -52,9 +52,8 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         Intent intent = new Intent(this, SwipingActivity.class);
-        //Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
-        //SleepTimer.delay(3, pair);
-        this.startActivity(intent);
+        Pair<MainActivity, Intent> pair = new Pair<>(this, intent);
+        SleepTimer.delay(3, pair);
     }
 
 

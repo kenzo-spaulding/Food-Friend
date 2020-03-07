@@ -5,11 +5,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.example.foodie_friend.frontend.dependencies.DownloadImage;
+import com.example.foodie_friend.frontend.dependencies.SleepTimer;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -224,9 +227,9 @@ public class RecyclerViewActivity extends AppCompatActivity {
         //ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDelete((ItemViewAdapter) adapter));
         //itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        //Intent intent = new Intent(this, SwipingActivity.class);
-        //Pair<RecyclerViewActivity, Intent> pair = new Pair<>(this, intent);
-        //SleepTimer.delay(5, pair);
+        Intent intent = new Intent(this, MapsActivity.class);
+        Pair<RecyclerViewActivity, Intent> pair = new Pair<>(this, intent);
+        SleepTimer.delay(5, pair);
 
 
         // Firebase: must do these in order

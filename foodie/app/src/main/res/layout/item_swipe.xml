@@ -47,12 +47,13 @@
                 android:alpha="0"
                 android:background="#5AF" />
 
-            <ImageView
-                android:id="@+id/imageView_itemImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/ic_launcher_foreground" />
         </FrameLayout>
+
+        <ImageView
+            android:id="@+id/imageView_itemImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_login_flower" />
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

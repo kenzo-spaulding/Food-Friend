@@ -1,18 +1,36 @@
 package com.example.foodie_friend;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import com.lorentzos.flingswipe.SwipeFlingAdapterView.*;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.example.foodie_friend.frontend.dependencies.SleepTimer;
 import com.example.foodie_friend.frontend.dependencies.DownloadImage;
@@ -36,29 +54,170 @@ class ImageContent{
     }
 }
 
+class RowItem {
+    private int imageId;
+    private String title;
+    private String desc;
 
-public class SwipingActivity extends AppCompatActivity {
+    public RowItem(int imageId, String title, String desc) {
+        this.imageId = imageId;
+        this.title = title;
+        this.desc = desc;
+    }
+    public int getImageId() {
+        return imageId;
+    }
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
+    }
+    public String getDesc() {
+        return desc;
+    }
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    @Override
+    public String toString() {
+        return title + "\n" + desc;
+    }
+}
 
-    private ArrayList<ImageContent> imageContents;
-    private ArrayAdapter<ImageContent> arrayAdapter;
+class ImageContentAdapter extends ArrayAdapter<RowItem>{
+    Context context;
+
+    public ImageContentAdapter(@NonNull Context context, int resource, @NonNull List<RowItem> objects) {
+        super(context, resource, objects);
+        this.context = context;
+    }
+
+    private class ViewHolder{
+        ImageView imageView;
+        TextView textView;
+        TextView textDesc;
+    }
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder = null;
+        RowItem rowItem = getItem(position);
+        LayoutInflater mInflater = (LayoutInflater) context
+                .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.item_swipe, null);
+            holder = new ViewHolder();
+            holder.textView = (TextView) convertView.findViewById(R.id.textView_card);
+            holder.textView = (TextView) convertView.findViewById(R.id.textView_card);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.imageView_itemImage);
+
+            convertView.setTag(holder);
+        } else
+            holder = (ViewHolder) convertView.getTag();
+
+        holder.textView.setText(rowItem.getTitle());
+        holder.textDesc.setText(rowItem.getTitle());
+        holder.imageView.setImageResource(rowItem.getImageId());
+        //holder.imageView.setImageURI(Uri.parse("https://logo.clearbit.com/mcdonalds.com"));
+        //new DownloadImage(holder.imageView).execute("https://logo.clearbit.com/mcdonalds.com");
+
+        return convertView;
+    }
+}
+
+
+
+
+public class SwipingActivity extends AppCompatActivity implements onFlingListener, OnItemClickListener {
+
+    private ArrayList<RowItem> imageContents;
+    private ImageContentAdapter arrayAdapterImg;
     private int i;
-    private ImageView image;
+
+    private ArrayList<String> str = new ArrayList<>(Arrays.asList("hello", "how", "are", "you"));
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swiping);
 
         imageContents = new ArrayList<>();
-        imageContents.add(new ImageContent("Chicken", "https://logo.clearbit.com/mcdonalds.com"));
-        imageContents.add(new ImageContent("Burgers", "https://logo.clearbit.com/mcdonalds.com"));
-        imageContents.add(new ImageContent("Pizza", "https://logo.clearbit.com/mcdonalds.com"));
-        imageContents.add(new ImageContent("Salads","https://logo.clearbit.com/mcdonalds.com"));
-        imageContents.add(new ImageContent("Cajun","https://logo.clearbit.com/mcdonalds.com"));
-        imageContents.add(new ImageContent("Pasta", "https://logo.clearbit.com/mcdonalds.com"));
-        imageContents.add(new ImageContent("Seafood", "https://logo.clearbit.com/mcdonalds.com"));
-        imageContents.add(new ImageContent("Vegan", "https://logo.clearbit.com/mcdonalds.com"));
+        imageContents.add(new RowItem(R.id.imageView_itemImage, "FastFood", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.id.imageView_itemImage, "Pizza", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.id.imageView_itemImage, "Sandwiches", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.id.imageView_itemImage, "Shipped","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.id.imageView_itemImage, "Seafood","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.id.imageView_itemImage, "Breakfast", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
 
-        arrayAdapter = new ArrayAdapter<>(this, R.layout.item_swipe, R.id.textView_card, imageContents );
+        //////////////////////////////////////////////////////
+
+        arrayAdapterImg = new ImageContentAdapter(this, R.layout.item_swipe, imageContents );
+
+        SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
+
+        flingContainer.setAdapter(arrayAdapterImg);
+        flingContainer.setFlingListener(this);
+        flingContainer.setOnItemClickListener(this);
+
+        //Remove when map is finished
+        //Intent intent = new Intent(this, ProfileActivity.class);
+        //Pair<SwipingActivity, Intent> pair = new Pair<>(this, intent);
+        //SleepTimer.delay(5, pair);
+    }
+
+    @Override
+    public void removeFirstObjectInAdapter() {
+        // this is the simplest way to delete an object from the Adapter (/AdapterView)
+        Log.d("LIST", "removed object!");
+        str.remove(0);
+        arrayAdapterImg.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLeftCardExit(Object o) {
+        //Do something on the left!
+        //You also have access to the original object.
+        //If you want to use it just cast it (String) dataObject
+        Toast.makeText(SwipingActivity.this, "Left!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRightCardExit(Object o) {
+        Toast.makeText(SwipingActivity.this, "Right!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAdapterAboutToEmpty(int i) {
+        // Ask for more data here
+        //str.add(new ImageContent("Food item: ".concat(String.valueOf(i)), "http://logo.clearbit.com/spotify.com?size=60"));
+        str.add("ended");
+        arrayAdapterImg.notifyDataSetChanged();
+        Log.d("LIST", "notified");
+        i++;
+    }
+
+    @Override
+    public void onScroll(float v) {
+        //View view = flingContainer.getSelectedView();
+        //view.findViewById(R.id.item_swipe_right_indicator).setAlpha(scrollProgressPercent < 0 ? -scrollProgressPercent : 0);
+        //view.findViewById(R.id.item_swipe_left_indicator).setAlpha(scrollProgressPercent > 0 ? scrollProgressPercent : 0);
+    }
+
+    @Override
+    public void onItemClicked(int i, Object o) {
+        // activates when the card is clicked
+        Toast.makeText(SwipingActivity.this, "Clicked!", Toast.LENGTH_SHORT).show();
+    }
+}
+
+
+
+
+/*
+
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.item_swipe, R.id.textView_card, textCards );
 
         SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
 
@@ -68,7 +227,9 @@ public class SwipingActivity extends AppCompatActivity {
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
+
                 imageContents.remove(0);
+                textCards.remove(0);
                 arrayAdapter.notifyDataSetChanged();
             }
 
@@ -88,7 +249,7 @@ public class SwipingActivity extends AppCompatActivity {
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
-                imageContents.add(new ImageContent("Food item: ".concat(String.valueOf(i)), "https://logo.clearbit.com/mcdonalds.com"));
+                imageContents.add(new ImageContent("Food item: ".concat(String.valueOf(i)), "http://logo.clearbit.com/spotify.com?size=60"));
                 arrayAdapter.notifyDataSetChanged();
                 Log.d("LIST", "notified");
                 i++;
@@ -111,13 +272,4 @@ public class SwipingActivity extends AppCompatActivity {
             }
         });
 
-
-
-        //Remove when map is finished
-
-        Intent intent = new Intent(this, MapsActivity.class);
-        Pair<SwipingActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(5, pair);
-    }
-}
-
+ */

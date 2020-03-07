@@ -53,6 +53,7 @@ public class SignInActivity extends AppCompatActivity {
 
         //TODO: remove the next line of code when ready to deploy
         usernameEditText.setText("anteater");
+        passwordEditText.setText("zotzot");
 
         loginButton = (Button) findViewById(R.id.login);
         createAccount = (Button) findViewById(R.id.button_Create_Account);

@@ -6,6 +6,20 @@
     android:layout_height="wrap_content">
 
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.13541667" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8854167" />
+
     <ImageView
         android:id="@+id/imageview_Background"
         android:layout_width="0dp"
@@ -25,19 +39,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MenuItem-Food"
-        app:layout_constraintEnd_toStartOf="@+id/imageView_Divider"
+        app:layout_constraintEnd_toStartOf="@+id/guideline11"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageview_CompanyLogo"
-        app:layout_constraintTop_toTopOf="@+id/imageview_CompanyLogo" />
+        app:layout_constraintStart_toStartOf="@+id/guideline12"
+        app:layout_constraintTop_toTopOf="@+id/guideline13" />
 
     <ImageView
         android:id="@+id/imageview_CompanyLogo"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageview_Background"
+        app:layout_constraintEnd_toStartOf="@+id/guideline12"
         app:layout_constraintStart_toStartOf="@+id/imageview_Background"
         app:layout_constraintTop_toTopOf="@+id/imageview_Background"
         app:layout_constraintVertical_bias="0.5"
@@ -50,28 +66,42 @@
         android:text="MenuItem-Drink"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView_Divider"
-        app:layout_constraintTop_toTopOf="@+id/imageview_CompanyLogo" />
+        app:layout_constraintStart_toStartOf="@+id/guideline11"
+        app:layout_constraintTop_toTopOf="@+id/guideline13" />
 
     <TextView
         android:id="@+id/textView_FoodMods"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Modifications"
-        app:layout_constraintBottom_toBottomOf="@+id/imageview_CompanyLogo"
-        app:layout_constraintEnd_toStartOf="@+id/imageView_Divider"
+        app:layout_constraintBottom_toTopOf="@+id/guideline14"
+        app:layout_constraintEnd_toStartOf="@+id/guideline11"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageview_CompanyLogo" />
+        app:layout_constraintStart_toStartOf="@+id/guideline12" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.58" />
 
     <TextView
         android:id="@+id/textView_DrinkMods"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Modifications"
-        app:layout_constraintBottom_toBottomOf="@+id/imageview_CompanyLogo"
+        app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView_Divider" />
+        app:layout_constraintStart_toStartOf="@+id/guideline11" />
 
     <TextView
         android:id="@+id/textView_FoodSize"
@@ -79,9 +109,8 @@
         android:layout_height="wrap_content"
         android:text="Food-Size"
         app:layout_constraintBottom_toTopOf="@+id/textView_FoodMods"
-        app:layout_constraintEnd_toStartOf="@+id/imageView_Divider"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageview_CompanyLogo"
+        app:layout_constraintEnd_toStartOf="@+id/guideline11"
+        app:layout_constraintStart_toStartOf="@+id/guideline12"
         app:layout_constraintTop_toBottomOf="@+id/textView_FoodName"
         app:layout_constraintVertical_bias="0.5" />
 
@@ -93,19 +122,9 @@
         app:layout_constraintBottom_toTopOf="@+id/textView_DrinkMods"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView_Divider"
+        app:layout_constraintStart_toStartOf="@+id/guideline11"
         app:layout_constraintTop_toBottomOf="@+id/textView_DrinkName"
         app:layout_constraintVertical_bias="0.5" />
-
-    <ImageView
-        android:id="@+id/imageView_Divider"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/imageview_Background"
-        app:layout_constraintStart_toEndOf="@+id/imageview_CompanyLogo"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_divider_line_vertical" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
