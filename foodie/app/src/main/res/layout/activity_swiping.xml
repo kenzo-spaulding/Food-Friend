@@ -145,7 +145,8 @@
                         android:id="@+id/button_Info"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/ic_training_info_button" />
+                        android:background="@drawable/ic_training_info_button"
+                        android:onClick="onClick_Info" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -160,7 +161,8 @@
                         android:id="@+id/button_like"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/ic_training_like_button" />
+                        android:background="@drawable/ic_training_like_button"
+                        android:onClick="onClick_Like" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -178,6 +180,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/ic_training_dislike_button"
+                        android:onClick="onClick_Dislike"
                         android:textAlignment="center" />
 
                 </FrameLayout>

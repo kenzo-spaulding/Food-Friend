@@ -1,15 +1,19 @@
 package com.example.foodie_friend;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView.*;
+
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -133,10 +137,11 @@ class ImageContentAdapter extends ArrayAdapter<RowItem>{
 public class SwipingActivity extends AppCompatActivity implements onFlingListener, OnItemClickListener {
 
     private ArrayList<RowItem> imageContents;
-    private ImageContentAdapter arrayAdapterImg;
+    private ArrayAdapter<String> arrayAdapterImg;
     private int i;
+    private SwipeFlingAdapterView flingContainer;
 
-    private ArrayList<String> str = new ArrayList<>(Arrays.asList("hello", "how", "are", "you"));
+    private ArrayList<String> str = new ArrayList<>(Arrays.asList("chicken", "beef", "salad", "soup"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,18 +158,18 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
 
         //////////////////////////////////////////////////////
 
-        arrayAdapterImg = new ImageContentAdapter(this, R.layout.item_swipe, imageContents );
+        arrayAdapterImg = new ArrayAdapter<>(this, R.layout.item_swipe, R.id.textView_card, str);
 
-        SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
+        flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
 
         flingContainer.setAdapter(arrayAdapterImg);
         flingContainer.setFlingListener(this);
         flingContainer.setOnItemClickListener(this);
 
         //Remove when map is finished
-        //Intent intent = new Intent(this, ProfileActivity.class);
-        //Pair<SwipingActivity, Intent> pair = new Pair<>(this, intent);
-        //SleepTimer.delay(5, pair);
+        Intent intent = new Intent(this, ProfileActivity.class);
+        Pair<SwipingActivity, Intent> pair = new Pair<>(this, intent);
+        SleepTimer.delay(5, pair);
     }
 
     @Override
@@ -177,15 +182,12 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
 
     @Override
     public void onLeftCardExit(Object o) {
-        //Do something on the left!
-        //You also have access to the original object.
-        //If you want to use it just cast it (String) dataObject
-        Toast.makeText(SwipingActivity.this, "Left!", Toast.LENGTH_SHORT).show();
+        //TODO: Log into Firebase the result
     }
 
     @Override
     public void onRightCardExit(Object o) {
-        Toast.makeText(SwipingActivity.this, "Right!", Toast.LENGTH_SHORT).show();
+        //TODO: Log into Firebase the result
     }
 
     @Override
@@ -207,8 +209,21 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
 
     @Override
     public void onItemClicked(int i, Object o) {
-        // activates when the card is clicked
-        Toast.makeText(SwipingActivity.this, "Clicked!", Toast.LENGTH_SHORT).show();
+        //TODO: Do you need to change the image when clicked/tapped?
+    }
+
+
+    public void onClick_Dislike(View view){
+        flingContainer.getTopCardListener().selectLeft();
+    }
+
+    public void onClick_Like(View view){
+        flingContainer.getTopCardListener().selectRight();
+    }
+
+    public void onClick_Info(View view){
+        String message = "Swipe image left to like, swipe right to dislike";
+        Toast.makeText(SwipingActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 }
 
