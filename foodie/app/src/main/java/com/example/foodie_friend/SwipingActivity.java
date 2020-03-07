@@ -144,12 +144,12 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
         setContentView(R.layout.activity_swiping);
 
         imageContents = new ArrayList<>();
-        imageContents.add(new RowItem(R.id.imageView_itemImage, "FastFood", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
-        imageContents.add(new RowItem(R.id.imageView_itemImage, "Pizza", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
-        imageContents.add(new RowItem(R.id.imageView_itemImage, "Sandwiches", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
-        imageContents.add(new RowItem(R.id.imageView_itemImage, "Shipped","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
-        imageContents.add(new RowItem(R.id.imageView_itemImage, "Seafood","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
-        imageContents.add(new RowItem(R.id.imageView_itemImage, "Breakfast", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.drawable.ic_training_image_background, "FastFood", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.drawable.ic_training_image_background, "Pizza", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.drawable.ic_training_image_background, "Sandwiches", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.drawable.ic_training_image_background, "Shipped","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.drawable.ic_training_image_background, "Seafood","https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
+        imageContents.add(new RowItem(R.drawable.ic_training_image_background, "Breakfast", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
 
         //////////////////////////////////////////////////////
 

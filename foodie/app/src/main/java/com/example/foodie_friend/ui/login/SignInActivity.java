@@ -129,15 +129,8 @@ public class SignInActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
-            }
-        });
+        loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
+                passwordEditText.getText().toString());
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
@@ -150,6 +143,12 @@ public class SignInActivity extends AppCompatActivity {
 
     private void showLoginFailed(final TextView indicator) {
         indicator.setText("username or password is incorrect");
+    }
+
+    public void onClick_SignIn(View view){
+        loadingProgressBar.setVisibility(View.VISIBLE);
+        loginViewModel.login(usernameEditText.getText().toString(),
+                passwordEditText.getText().toString());
     }
 
     public void onClick_CreateNewAccount(View view){
