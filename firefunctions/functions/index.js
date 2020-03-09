@@ -3,37 +3,48 @@ const yelp = yelp_api.client('9sChg8nmLtdalv3Ls2uQVcnnThZCwPhGHSSfkn-0HKST6ksDZm
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const milesToMeters = 1609.34;
-const heads = {
-    "Japanese": {"score": 1000},
-    "American": {"score": 1000},
-    "Indian": {"score": 1000},
-    "Himalayan": {"score": 1000},
-    "Vegetarian": {"score": 1000},
-    "Health Food": {"score": 1000},
-    "Mexican": {"score": 1000},
-    "Latin": {"score": 1000},
-    "Irish": {"score": 1000},
-    "French": {"score": 1000},
-    "Italian": {"score": 1000},
-    "Thai": {"score": 1000},
-    "Fast Food": {"score": 1000},
-    "Pizza": {"score": 1000},
-    "Chinese": {"score": 1000},
-    "Persian": {"score": 1000},
-    "Middle Eastern": {"score": 1000},
-    "Asian": {"score": 1000},
-    "African": {"score": 1000},
-    "Seafood": {"score": 1000},
-    "Steakhouse": {"score": 1000},
-    "Korean": {"score": 1000},
-    "Sushi": {"score": 1000},
-    "Breakfast": {"score": 1000}
+const bodies = {
+    "None": 1000,
+    "Fast": 1000,
+    "Calm": 1000,
+    "Quiet": 1000,
+    "Fancy": 1000,
+    "Open Late": 1000,
+    "Veggie": 1000,
+    "Healthy": 1000,
+    "Lively": 1000,
+    "Chic": 1000,
+    "Modern": 1000,
+    "Vegan": 1000,
+    "Cheap": 1000,
 };
-// const heads = ["New American", "American", "Indian", "Himalayan", "Vegetarian", "Health Food", "Bar", "Mexican",
-//     "Latin", "Irish", "French", "Italian", "Thai", "Fast Food", "Pizza", "Chinese", "Japanese", "Persian",
-//     "Middle Eastern", "Asian", "African", "Seafood", "Steakhouse", "Korean", "Sushi"];
-const bodies = ["Fast", "Calm", "Quiet", "Fancy", "Open Late", "Veggie", "Healthy", "Lively", "Chic", "Modern",
-    "Vegan", "Fancy", "Cheap"];
+const heads = {
+    "American": {"score": 1000, "subQueries": bodies},
+    "Indian": {"score": 1000, "subQueries": bodies},
+    "Himalayan": {"score": 1000, "subQueries": bodies},
+    "Vegetarian": {"score": 1000, "subQueries": bodies},
+    "Health Food": {"score": 1000, "subQueries": bodies},
+    "Mexican": {"score": 1000, "subQueries": bodies},
+    "Latin": {"score": 1000, "subQueries": bodies},
+    "Irish": {"score": 1000, "subQueries": bodies},
+    "French": {"score": 1000, "subQueries": bodies},
+    "Italian": {"score": 1000, "subQueries": bodies},
+    "Thai": {"score": 1000, "subQueries": bodies},
+    "Fast Food": {"score": 1000, "subQueries": bodies},
+    "Pizza": {"score": 1000, "subQueries": bodies},
+    "Chinese": {"score": 1000, "subQueries": bodies},
+    "Middle Eastern": {"score": 1000, "subQueries": bodies},
+    "Mediterranean": {"score": 1000, "subQueries": bodies},
+    "African": {"score": 1000, "subQueries": bodies},
+    "Korean": {"score": 1000, "subQueries": bodies},
+    "Sushi": {"score": 1000, "subQueries": bodies},
+    "Breakfast": {"score": 1000, "subQueries": bodies}
+};
+
+
+// todo send what the head and bodies queried with were to the device and return the tags from the phone.
+// the winner can have a second list entry that is a map of form:
+// {winner: "subtag", losers: ["subtags"]}
 
 admin.initializeApp({
     credential: admin.credential.applicationDefault(),
@@ -103,23 +114,28 @@ exports.updateUserPrefs = functions.https.onCall(async (information, context) =>
         let k = resp.toJSON().k;
         console.log('data: ' + JSON.stringify(data));
         let winner = [information.winner, data[information.winner].score];
+        let subWinner = [information.subWinner, data[information.winner].subQueries[information.subWinner]];
+        let subLosers = [];
         let losers = [];
 
         information.losers.forEach((loser) => {
             losers.push([loser, data[loser].score]);
         });
 
-        console.log('winner is: ' + JSON.stringify(winner));
-        console.log('losers are: ' + JSON.stringify(losers));
+        if (information.subLosers) {
+            information.subLosers.forEach((loser) => {
+                subLosers.push([loser, data[information.winner].subQueries[loser]]);
+            });
+        }
 
-        return rankCalculate(information.winner, winner, information.losers, losers, k, db);
+        return rankCalculate(information.winner, subWinner, winner, information.losers, subLosers, losers, k, db);
     } catch (e) {
         console.log('error encountered: ' + e);
         return 'error encountered: ' + e;
     }
 });
 
-async function rankCalculate(winnerName, winner, loserNames, losers, k, db) {
+async function rankCalculate(winnerName, subWinner, winner, loserNames, subLosers, losers, k, db) {
     // Pairwise Elo, Winner gains based on average win amount, losers each lose, over time, k decreases
     try {
         let wins = 0;
@@ -134,15 +150,37 @@ async function rankCalculate(winnerName, winner, loserNames, losers, k, db) {
 
         winner[1] = winner[1] + (wins / count);
 
-        await db.child('queryHead').child(winnerName).update({score: winner[1]});
-        await losers.forEach((loser) => {
-            db.child('queryHead').child(loser[0]).update({score: loser[1]});
+        let promises = [];
+
+        promises.push(db.child('queryHead').child(winnerName).update({score: winner[1]}));
+
+        let subWins = 0;
+        let subCount = subLosers.length;
+        subLosers.forEach((loser) => {
+            let p1 = (1.0 / (1.0 + Math.pow(10, (subWinner[1] - loser[1]) / 400)));
+            let p2 = 1 - p1;
+
+            subWins += k * (1 - p1);
+            loser[1] = loser[1] + ((k * (0 - p2)) / subCount);
+        });
+
+        subWinner[1] = subWinner[1] + (subWins / subCount);
+
+        promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(subWinner[0]).set(subWinner[1]));
+
+        subLosers.forEach((loser) => {
+            promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(loser[0]).set(loser[1]));
+        });
+
+        losers.forEach((loser) => {
+            promises.push(db.child('queryHead').child(loser[0]).update({score: loser[1]}));
         });
 
         if (k > 10) {
-            await db.update({k: k - 1});
+            promises.push(db.update({k: k - 1}));
         }
 
+        await Promise.all(promises);
         return 'success';
     } catch (e) {
         console.log('error encountered in rank Calculate: ' + e);
@@ -160,13 +198,7 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
         console.log('userModel: ' + JSON.stringify(userModel));
         console.log('location: ' + JSON.stringify(location));
 
-        await gatherInformation(userModel.toJSON(), location.toJSON());
-        let yelpQuery = await buildQuery(userModel.toJSON(), location.toJSON());
-        console.log('yelpQuery: ' + JSON.stringify(yelpQuery));
-        response = await getRestaurants(yelpQuery);
-        console.log('response: ' + JSON.stringify(response));
-        return await response;
-
+        return await gatherInformation(userModel.toJSON(), location.toJSON());
     } catch (e) {
         console.log("error: " + e);
         return 'error: ' + e;
@@ -174,22 +206,47 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
 });
 
 async function gatherInformation(userModel, location) {
-    let queryHead = userModel.queryHead;
-    let queryHeadList = Object.entries(queryHead);
+    // let queryHeadList = Object.entries(userModel.queryHead);
+    try {
+        let search = Object.entries(userModel.queryHead).sort((a, b) => {
+            return b[1].score - a[1].score;
+        });
+        let queryPromises = [];
+        for (let i = 0; i < 5; i++) {
+            let subSearch = search[i][1].subQueries.sort((a, b) => {
+                return b - a;
+            });
+            for (let j = 0; j < 3; j++) {
+                queryPromises.push(getRestaurants(buildQuery(userModel, location, subSearch[j] + ' ' + search[i][0]), search[i][0], subSearch[j]));
+            }
+        }
 
-    console.log('queryHead is: ' + JSON.stringify(queryHead));
-    console.log('queryHeadList is: ' + JSON.stringify(queryHeadList));
+        let responses = await Promise.all(queryPromises);
+        let restaurants = [];
+        responses.forEach((resp) => {
+            console.log('response: ' + JSON.stringify(resp));
+            let businesses = JSON.parse(resp.body).businesses;
+            businesses.forEach((bus) => {
+                bus.headQuery = resp.headQuery;
+                restaurants.push(bus);
+            });
+        });
 
-    let search = queryHeadList.sort((a, b) => {
-        return b[1].score - a[1].score;
-    });
-    console.log('search queue is: ' + JSON.stringify(search));
+        return restaurants;
+    } catch (e) {
+        console.log('error encountered: ' + e);
+        return 'error encountered: ' + e;
+    }
 }
 
-async function getRestaurants(query) {
+async function getRestaurants(query, headQuery, subQuery) {
     console.log("getting yelp information");
     try {
-        return await yelp.search(query);
+        let resp = await yelp.search(query);
+        resp.headQuery = headQuery;
+        resp.subQuery = subQuery;
+
+        return resp;
     } catch (e) {
         console.log('error talking to Yelp, ' + e);
         throw e;
@@ -197,8 +254,6 @@ async function getRestaurants(query) {
 }
 
 function buildQuery(userModel, location, query) {  // todo Terms need to be taken from userModel
-
-
     return {
         term: query,
         latitude: location.latitude,
@@ -206,7 +261,7 @@ function buildQuery(userModel, location, query) {  // todo Terms need to be take
         price: userModel.price,
         open_now: true,
         radius: Math.floor(userModel.distancePreferred * milesToMeters),
-        categories: 'food',
-        limit: 3,
+        categories: 'restaurants',
+        limit: 2,
     };
 }
