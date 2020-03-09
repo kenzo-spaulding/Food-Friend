@@ -39,25 +39,6 @@ admin.initializeApp({
     databaseURL: 'https://foodie-friend.firebaseio.com'
 });
 
-function rankCalculate(winner, losers, k, db) {
-    // Pairwise Elo, Winner gains based on average win amount, losers each lose, over time, k decreases
-    let wins = 0;
-    let count = 0;
-    losers.forEach((loser) => {
-        let p1 = (1.0 / (1.0 + Math.pow(10, (winner.score - loser.score) / 400)));
-        let p2 = 1 - p1;
-
-        wins += k * (1 - p1);
-        loser.score = loser.score + k * (0 - p2);
-        count += 1;
-    });
-
-    winner.score = winner.score + (wins / count);
-
-    return 'success';
-    // todo write back into db
-}
-
 exports.addUserToDB = functions.auth.user().onCreate((user) => {
     console.log('deploying user information to db: ' + JSON.stringify(user));
     return admin.database().ref('users/' + user.uid).set({
@@ -66,25 +47,25 @@ exports.addUserToDB = functions.auth.user().onCreate((user) => {
             distancePreferred: 5,
             price: 2,
             queryHead: heads,
-            k: 100,
+            k: 50,
         },
         1: {
             distancePreferred: 5,
             price: 2,
             queryHead: heads,
-            k: 100,
+            k: 50,
         },
         2: {
             distancePreferred: 5,
             price: 2,
             queryHead: heads,
-            k: 100,
+            k: 50,
         },
         3: {
             distancePreferred: 5,
             price: 2,
             queryHead: heads,
-            k: 100,
+            k: 50,
         },
         location: {
             latitude: 0,
@@ -117,61 +98,57 @@ exports.updateUserPrefs = functions.https.onCall(async (information, context) =>
         let db = await admin.database().ref('users/' + information.uid + '/' + information.timeOfDay);
         // let db = await admin.database().ref('users/' + context.auth.uid + '/' + data.timeOfDay);
         let resp = await db.once('value', (data) => (data));
-        let data = Object.values(resp.toJSON().queryHead);
-        let winner = [information.winner, data[information.winner]];
+        let data = resp.toJSON().queryHead;
+        let k = resp.toJSON().k;
+        console.log('data: ' + JSON.stringify(data));
+        let winner = [information.winner, data[information.winner].score];
         let losers = [];
 
         information.losers.forEach((loser) => {
-            losers.push([loser, dat[loser]]);
+            losers.push([loser, data[loser].score]);
         });
 
         console.log('winner is: ' + JSON.stringify(winner));
         console.log('losers are: ' + JSON.stringify(losers));
 
-        return rankCalculate(winner, losers, data.k, data);
-    }
-    catch (e) {
+        return rankCalculate(information.winner, winner, information.losers, losers, k, db);
+    } catch (e) {
         console.log('error encountered: ' + e);
         return 'error encountered: ' + e;
     }
 });
 
-// exports.addUserHeadTag = functions.https.onCall(async (info, context) => {
-//     console.log('received tags to add: ' + JSON.stringify(info));
-//
-//     let db = await admin.database().ref('users/' + info.uid + '/' + info.timeOfDay);
-//     // let db = admin.database().ref('users/' + context.auth.uid + '/' + info.timeOfDay);
-//     let resp = await db.once('value', (data) => (data));
-//     let data = Object.values(resp.toJSON().queryHead);
-//     console.log('data: ' + JSON.stringify(data));
-//     info.tags.forEach((item) => {
-//         if (!data.includes(item)) {
-//             data.push(item); // this didn't work
-//         }
-//     });
-//
-//     await db.child('queryHead').set(data);
-//     return 'added to headTags, current values are: ' + data;
-// });
-//
-// exports.removeUserHeadTag = functions.https.onCall(async (info, context) => {
-//     console.log('recieved tags to remove: ' + JSON.stringify(info));
-//
-//     let db = await admin.database().ref('users/' + info.uid + '/' + info.timeOfDay);
-//     // let db = admin.database().ref('users/' + context.auth.uid + '/' + info.timeOfDay);
-//     let resp = await db.once('value', (data) => (data));
-//     let data = Object.values(resp.toJSON().queryHead);
-//     console.log('data: ' + JSON.stringify(data));
-//     info.tags.forEach((item) => {
-//         if (data.includes(item)) {
-//             let index = data.indexOf(item);
-//             data.splice(index, 1);
-//         }
-//     });
-//
-//     await db.child('queryHead').set(data);
-//     return 'removed to headTags, current values are: ' + data;
-// });
+async function rankCalculate(winnerName, winner, loserNames, losers, k, db) {
+    // Pairwise Elo, Winner gains based on average win amount, losers each lose, over time, k decreases
+    try {
+        let wins = 0;
+        let count = 0;
+        losers.forEach((loser) => {
+            let p1 = (1.0 / (1.0 + Math.pow(10, (winner[1] - loser[1]) / 400)));
+            let p2 = 1 - p1;
+
+            wins += k * (1 - p1);
+            loser[1] = loser[1] + k * (0 - p2);
+            count += 1;
+        });
+
+        winner[1] = winner[1] + (wins / count);
+
+        await db.child('queryHead').child(winnerName).update({score: winner[1]});
+        await losers.forEach((loser) => {
+            db.child('queryHead').child(loser[0]).update({score: loser[1]/count});
+        });
+
+        if (k > 10) {
+            await db.update({k: k - 1});
+        }
+
+        return 'success';
+    } catch (e) {
+        console.log('error encountered in rank Calculate: ' + e);
+        return 'error encountered in rank Calculate: ' + e;
+    }
+}
 
 exports.recommendations = functions.https.onCall(async (data, context) => {
     console.log("Data: " + JSON.stringify(data));
