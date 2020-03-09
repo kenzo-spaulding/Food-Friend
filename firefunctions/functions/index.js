@@ -4,7 +4,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const milesToMeters = 1609.34;
 const heads = {
-    "New American": {"score": 1000},
+    "Japanese": {"score": 1000},
     "American": {"score": 1000},
     "Indian": {"score": 1000},
     "Himalayan": {"score": 1000},
@@ -27,6 +27,7 @@ const heads = {
     "Steakhouse": {"score": 1000},
     "Korean": {"score": 1000},
     "Sushi": {"score": 1000},
+    "Breakfast": {"score": 1000}
 };
 // const heads = ["New American", "American", "Indian", "Himalayan", "Vegetarian", "Health Food", "Bar", "Mexican",
 //     "Latin", "Irish", "French", "Italian", "Thai", "Fast Food", "Pizza", "Chinese", "Japanese", "Persian",
@@ -56,14 +57,14 @@ exports.addUserToDB = functions.auth.user().onCreate((user) => {
             k: 50,
         },
         2: {
-            distancePreferred: 5,
-            price: 2,
+            distancePreferred: 10,
+            price: 3,
             queryHead: heads,
             k: 50,
         },
         3: {
             distancePreferred: 5,
-            price: 2,
+            price: 1,
             queryHead: heads,
             k: 50,
         },
@@ -122,21 +123,20 @@ async function rankCalculate(winnerName, winner, loserNames, losers, k, db) {
     // Pairwise Elo, Winner gains based on average win amount, losers each lose, over time, k decreases
     try {
         let wins = 0;
-        let count = 0;
+        let count = loserNames.length;
         losers.forEach((loser) => {
             let p1 = (1.0 / (1.0 + Math.pow(10, (winner[1] - loser[1]) / 400)));
             let p2 = 1 - p1;
 
             wins += k * (1 - p1);
-            loser[1] = loser[1] + k * (0 - p2);
-            count += 1;
+            loser[1] = loser[1] + ((k * (0 - p2)) / count);
         });
 
         winner[1] = winner[1] + (wins / count);
 
         await db.child('queryHead').child(winnerName).update({score: winner[1]});
         await losers.forEach((loser) => {
-            db.child('queryHead').child(loser[0]).update({score: loser[1]/count});
+            db.child('queryHead').child(loser[0]).update({score: loser[1]});
         });
 
         if (k > 10) {
@@ -159,16 +159,32 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
         let location = await db.child('location').once('value', (data) => (data));
         console.log('userModel: ' + JSON.stringify(userModel));
         console.log('location: ' + JSON.stringify(location));
+
+        await gatherInformation(userModel.toJSON(), location.toJSON());
         let yelpQuery = await buildQuery(userModel.toJSON(), location.toJSON());
         console.log('yelpQuery: ' + JSON.stringify(yelpQuery));
         response = await getRestaurants(yelpQuery);
         console.log('response: ' + JSON.stringify(response));
         return await response;
+
     } catch (e) {
         console.log("error: " + e);
         return 'error: ' + e;
     }
 });
+
+async function gatherInformation(userModel, location) {
+    let queryHead = userModel.queryHead;
+    let queryHeadList = Object.entries(queryHead);
+
+    console.log('queryHead is: ' + JSON.stringify(queryHead));
+    console.log('queryHeadList is: ' + JSON.stringify(queryHeadList));
+
+    let search = queryHeadList.sort((a, b) => {
+        return b[1].score - a[1].score;
+    });
+    console.log('search queue is: ' + JSON.stringify(search));
+}
 
 async function getRestaurants(query) {
     console.log("getting yelp information");
@@ -182,6 +198,7 @@ async function getRestaurants(query) {
 
 function buildQuery(userModel, location, query) {  // todo Terms need to be taken from userModel
 
+
     return {
         term: query,
         latitude: location.latitude,
@@ -189,5 +206,7 @@ function buildQuery(userModel, location, query) {  // todo Terms need to be take
         price: userModel.price,
         open_now: true,
         radius: Math.floor(userModel.distancePreferred * milesToMeters),
+        categories: 'food',
+        limit: 3,
     };
 }
