@@ -1,10 +1,11 @@
 const yelp_api = require('yelp-fusion');
-const yelp = yelp_api.client('9sChg8nmLtdalv3Ls2uQVcnnThZCwPhGHSSfkn-0HKST6ksDZmzfn55yV1VBKG32TGE406Y-EAP3wC-h3aqZ7o6Qzsb7-X37piqoLItl0yrEXl8DBcI6I7BcS9EnXnYx');
+// const yelp = yelp_api.client('9sChg8nmLtdalv3Ls2uQVcnnThZCwPhGHSSfkn-0HKST6ksDZmzfn55yV1VBKG32TGE406Y-EAP3wC-h3aqZ7o6Qzsb7-X37piqoLItl0yrEXl8DBcI6I7BcS9EnXnYx');
+const yelp = yelp_api.client('rxW3uXXBPZThSA4XwqLdds0jYTjsQIzBjvTxftJBuliRFgcRe3rhfvRt7S-ZroW6PHeQvSGPJYOKLmHbsfm6dB_7pOUPgj79J9JXJchbgyH3PNhHNAn1iK5YUeRlXnYx');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const milesToMeters = 1609.34;
 const bodies = {
-    "None": 1000,
+    "None": 1050,
     "Fast": 1000,
     "Calm": 1000,
     "Quiet": 1000,
@@ -206,36 +207,44 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
 });
 
 async function gatherInformation(userModel, location) {
-    // let queryHeadList = Object.entries(userModel.queryHead);
+    // todo make sure I don't get redundant restaurants
+    // todo figure out how to rate limit
     try {
         let search = Object.entries(userModel.queryHead).sort((a, b) => {
             return b[1].score - a[1].score;
         });
-        let queryPromises = [];
-        for (let i = 0; i < 5; i++) {
-            let subSearch = search[i][1].subQueries.sort((a, b) => {
+        let promises = [];
+
+        for (let i = 0; i < 3; i++) {
+            let subSearch = Object.entries(search[i][1].subQueries).sort((a, b) => {
                 return b - a;
             });
-            for (let j = 0; j < 3; j++) {
-                queryPromises.push(getRestaurants(buildQuery(userModel, location, subSearch[j] + ' ' + search[i][0]), search[i][0], subSearch[j]));
+            let subPromises = [];
+            for (let j = 0; j < 1; j++) {
+                if (subSearch[j][0] === "None") {
+                    promises.push(getRestaurants(buildQuery(userModel, location, search[i][0]), search[i][0], subSearch[j][0]));
+                } else {
+                    promises.push(getRestaurants(buildQuery(userModel, location, subSearch[j][0] + ' ' + search[i][0]), search[i][0], subSearch[j][0]));
+                }
             }
         }
 
-        let responses = await Promise.all(queryPromises);
+        let responses = await Promise.all(promises);
         let restaurants = [];
         responses.forEach((resp) => {
             console.log('response: ' + JSON.stringify(resp));
             let businesses = JSON.parse(resp.body).businesses;
             businesses.forEach((bus) => {
                 bus.headQuery = resp.headQuery;
+                bus.subQuery = resp.subQuery;
                 restaurants.push(bus);
             });
         });
 
         return restaurants;
     } catch (e) {
-        console.log('error encountered: ' + e);
-        return 'error encountered: ' + e;
+        console.log('error: ' + e);
+        return 'error: ' + e;
     }
 }
 
@@ -259,9 +268,9 @@ function buildQuery(userModel, location, query) {  // todo Terms need to be take
         latitude: location.latitude,
         longitude: location.longitude,
         price: userModel.price,
-        open_now: true,
+        // open_now: true,
         radius: Math.floor(userModel.distancePreferred * milesToMeters),
         categories: 'restaurants',
-        limit: 2,
+        limit: 4,
     };
 }
