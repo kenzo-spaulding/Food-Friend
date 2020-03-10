@@ -43,7 +43,6 @@ const heads = {
 };
 
 
-
 admin.initializeApp({
     credential: admin.credential.applicationDefault(),
     databaseURL: 'https://foodie-friend.firebaseio.com'
@@ -102,6 +101,21 @@ exports.updateUserLocation = functions.https.onCall((location, context) => {
         });
 });
 
+exports.addVisitedRestaurant = functions.https.onCall(async (info, context) => {
+    try {
+        let uid = info.uid ? info.uid : context.auth.uid;
+        let db = await admin.database().ref('users/' + uid + '/' + info.timeOfDay + '/restaurants');
+        if (!db.hasChild(info.rid)) {
+            let restaurants = await admin.database().ref('restaurants/' + info.rid).once('value');
+            db = await db.push(info.rid);
+            await db.set(restaurants.toJSON());
+        }
+    } catch (e) {
+        console.log(e);
+        return e;
+    }
+});
+
 exports.updateUserPrefs = functions.https.onCall(async (information, context) => {
     console.log('recieved information for updating user preferrences: ' + JSON.stringify(information));
     try {
@@ -112,7 +126,9 @@ exports.updateUserPrefs = functions.https.onCall(async (information, context) =>
         let k = resp.toJSON().k;
         console.log('data: ' + JSON.stringify(data));
         let winner = [information.winner, data[information.winner].score];
-        let subWinner = [information.subWinner, data[information.winner].subQueries[information.subWinner]];
+        if (information.subWinner) {
+            let subWinner = [information.subWinner, data[information.winner].subQueries[information.subWinner]];
+        }
         let subLosers = [];
         let losers = [];
 
@@ -152,24 +168,25 @@ async function rankCalculate(winnerName, subWinner, winner, loserNames, subLoser
 
         promises.push(db.child('queryHead').child(winnerName).update({score: winner[1]}));
 
-        let subWins = 0;
-        let subCount = subLosers.length;
-        subLosers.forEach((loser) => {
-            let p1 = (1.0 / (1.0 + Math.pow(10, (subWinner[1] - loser[1]) / 400)));
-            let p2 = 1 - p1;
+        if (subWinner) {
+            let subWins = 0;
+            let subCount = subLosers.length;
+            subLosers.forEach((loser) => {
+                let p1 = (1.0 / (1.0 + Math.pow(10, (subWinner[1] - loser[1]) / 400)));
+                let p2 = 1 - p1;
 
-            subWins += k * (1 - p1);
-            loser[1] = loser[1] + ((k * (0 - p2)) / subCount);
-        });
+                subWins += k * (1 - p1);
+                loser[1] = loser[1] + ((k * (0 - p2)) / subCount);
+            });
 
-        subWinner[1] = subWinner[1] + (subWins / subCount);
+            subWinner[1] = subWinner[1] + (subWins / subCount);
 
-        promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(subWinner[0]).set(subWinner[1]));
+            promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(subWinner[0]).set(subWinner[1]));
 
-        subLosers.forEach((loser) => {
-            promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(loser[0]).set(loser[1]));
-        });
-
+            subLosers.forEach((loser) => {
+                promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(loser[0]).set(loser[1]));
+            });
+        }
         losers.forEach((loser) => {
             promises.push(db.child('queryHead').child(loser[0]).update({score: loser[1]}));
         });
@@ -192,14 +209,15 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
     try {
         let uid = data.uid ? data.uid : context.auth.uid;
         let db = await admin.database().ref('users/' + uid);
+        let restaurantDB = await admin.database().ref('restaurants');
         let userModel = await db.child(data.timeOfDay).once('value', (data) => (data));
         let location = await db.child('location').once('value', (data) => (data));
 
         let enRoute = data.enRoute ? data.enRoute : false;
         let locations = data.route ? data.route : location.toJSON();
-        userModel.distancePreferred = data.weather ? userModel.distancePreferred/2 : userModel.distancePreferred;
+        userModel.distancePreferred = data.weather ? userModel.distancePreferred / 2 : userModel.distancePreferred;
 
-        return await gatherInformation(userModel.toJSON(), locations, enRoute);
+        return await gatherInformation(userModel.toJSON(), locations, enRoute, restaurantDB);
 
     } catch (e) {
         console.log("error: " + e);
@@ -207,7 +225,7 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
     }
 });
 
-async function gatherInformation(userModel, locations, enRoute) {
+async function gatherInformation(userModel, locations, enRoute, restaurantDB) {
     try {
         let search = Object.entries(userModel.queryHead).sort((a, b) => {
             return b[1].score - a[1].score;
@@ -237,12 +255,18 @@ async function gatherInformation(userModel, locations, enRoute) {
             }
         }
 
+        let restDBItems = await restaurantDB.once('value');
         let responses = await Promise.all(promises), restaurants = [], seenRestaurants = new Set(), rests = 0;
         responses.forEach((resp) => {
             let businesses = JSON.parse(resp.body).businesses;
             businesses.forEach((bus) => {
+                if (!restDBItems.hasChild(bus.id)) {
+                    restaurantDB = restaurantDB.push(bus.id);
+                    restaurantDB.set(bus);
+                }
                 bus.headQuery = resp.headQuery;
                 bus.subQuery = resp.subQuery ? resp.subQuery : resp.subQuery;
+                bus.distance = resp.distance / milesToMeters;
                 if (!seenRestaurants.has(bus.id)) {
                     restaurants.push(bus);
                     seenRestaurants.add(bus.id);
