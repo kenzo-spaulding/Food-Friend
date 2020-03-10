@@ -43,9 +43,6 @@ const heads = {
 };
 
 
-// todo send what the head and bodies queried with were to the device and return the tags from the phone.
-// the winner can have a second list entry that is a map of form:
-// {winner: "subtag", losers: ["subtags"]}
 
 admin.initializeApp({
     credential: admin.credential.applicationDefault(),
@@ -93,9 +90,9 @@ exports.updateUserLocation = functions.https.onCall((location, context) => {
         latitude: location.latitude,
         longitude: location.longitude
     };
-
+    let uid = location.uid ? location.uid : context.auth.uid;
     // admin.database().ref('users/' + context.auth.uid);
-    return admin.database().ref('users/' + location.uid + '/location').set(updatedLocation)
+    return admin.database().ref('users/' + uid + '/location').set(updatedLocation)
         .then(() => {
             console.log('user location now: ' + JSON.stringify(updatedLocation));
             return updatedLocation;
@@ -108,8 +105,8 @@ exports.updateUserLocation = functions.https.onCall((location, context) => {
 exports.updateUserPrefs = functions.https.onCall(async (information, context) => {
     console.log('recieved information for updating user preferrences: ' + JSON.stringify(information));
     try {
-        let db = await admin.database().ref('users/' + information.uid + '/' + information.timeOfDay);
-        // let db = await admin.database().ref('users/' + context.auth.uid + '/' + data.timeOfDay);
+        let uid = information.uid ? information.uid : context.auth.uid;
+        let db = await admin.database().ref('users/' + uid + '/' + information.timeOfDay);
         let resp = await db.once('value', (data) => (data));
         let data = resp.toJSON().queryHead;
         let k = resp.toJSON().k;
@@ -193,54 +190,69 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
     console.log("Data: " + JSON.stringify(data));
 
     try {
-        let db = await admin.database().ref('users/' + data.uid);
+        let uid = data.uid ? data.uid : context.auth.uid;
+        let db = await admin.database().ref('users/' + uid);
         let userModel = await db.child(data.timeOfDay).once('value', (data) => (data));
         let location = await db.child('location').once('value', (data) => (data));
-        console.log('userModel: ' + JSON.stringify(userModel));
-        console.log('location: ' + JSON.stringify(location));
 
-        return await gatherInformation(userModel.toJSON(), location.toJSON());
+        let enRoute = data.enRoute ? data.enRoute : false;
+        let locations = data.route ? data.route : location.toJSON();
+        userModel.distancePreferred = data.weather ? userModel.distancePreferred/2 : userModel.distancePreferred;
+
+        return await gatherInformation(userModel.toJSON(), locations, enRoute);
+
     } catch (e) {
         console.log("error: " + e);
         return 'error: ' + e;
     }
 });
 
-async function gatherInformation(userModel, location) {
-    // todo make sure I don't get redundant restaurants
-    // todo figure out how to rate limit
+async function gatherInformation(userModel, locations, enRoute) {
     try {
         let search = Object.entries(userModel.queryHead).sort((a, b) => {
             return b[1].score - a[1].score;
         });
-        let promises = [];
-
-        for (let i = 0; i < 3; i++) {
-            let subSearch = Object.entries(search[i][1].subQueries).sort((a, b) => {
-                return b - a;
+        let promises = [], delay = 0;
+        if (enRoute === true) {
+            locations.forEach((location) => {
+                let distancePreferred = 2;
+                for (let i = 0; i < 3; i++) {
+                    promises.push(getRestaurants(buildQuery(userModel.price, distancePreferred, location, search[i][0]), search[i][0], undefined, delay));
+                    delay += 0.25;
+                }
             });
-            let subPromises = [];
-            for (let j = 0; j < 1; j++) {
-                if (subSearch[j][0] === "None") {
-                    promises.push(getRestaurants(buildQuery(userModel, location, search[i][0]), search[i][0], subSearch[j][0]));
-                } else {
-                    promises.push(getRestaurants(buildQuery(userModel, location, subSearch[j][0] + ' ' + search[i][0]), search[i][0], subSearch[j][0]));
+        } else {
+            for (let i = 0; i < 5; i++) {
+                let subSearch = Object.entries(search[i][1].subQueries).sort((a, b) => {
+                    return b - a;
+                });
+                for (let j = 0; j < 3; j++) {
+                    if (subSearch[j][0] === "None") {
+                        promises.push(getRestaurants(buildQuery(userModel.price, userModel.distancePreferred, locations, search[i][0]), search[i][0], subSearch[j][0], delay));
+                    } else {
+                        promises.push(getRestaurants(buildQuery(userModel.price, userModel.distancePreferred, locations, subSearch[j][0] + ' ' + search[i][0]), search[i][0], subSearch[j][0], delay));
+                    }
+                    delay += 0.25;
                 }
             }
         }
 
-        let responses = await Promise.all(promises);
-        let restaurants = [];
+        let responses = await Promise.all(promises), restaurants = [], seenRestaurants = new Set(), rests = 0;
         responses.forEach((resp) => {
-            console.log('response: ' + JSON.stringify(resp));
             let businesses = JSON.parse(resp.body).businesses;
             businesses.forEach((bus) => {
                 bus.headQuery = resp.headQuery;
-                bus.subQuery = resp.subQuery;
-                restaurants.push(bus);
+                bus.subQuery = resp.subQuery ? resp.subQuery : resp.subQuery;
+                if (!seenRestaurants.has(bus.id)) {
+                    restaurants.push(bus);
+                    seenRestaurants.add(bus.id);
+                }
+                rests++;
             });
         });
 
+        console.log('Number of returned restaurants:' + rests);
+        console.log('Number of unique restaurants: ' + restaurants.length);
         return restaurants;
     } catch (e) {
         console.log('error: ' + e);
@@ -248,28 +260,42 @@ async function gatherInformation(userModel, location) {
     }
 }
 
-async function getRestaurants(query, headQuery, subQuery) {
-    console.log("getting yelp information");
-    try {
-        let resp = await yelp.search(query);
-        resp.headQuery = headQuery;
-        resp.subQuery = subQuery;
+function delay(t, v) {
+    return new Promise(((resolve) => {
+        setTimeout(resolve.bind(null, v), t)
+    }));
+}
 
-        return resp;
+function getRestaurants(query, headQuery, subQuery, n) {
+    try {
+        return delay(1000 * n)
+            .then(() => {
+                return yelp.search(query);
+            })
+            .then((resp) => {
+                resp.headQuery = headQuery;
+                resp.subQuery = subQuery;
+
+                return resp;
+            })
+            .catch((e) => {
+                throw e;
+            });
+
     } catch (e) {
         console.log('error talking to Yelp, ' + e);
         throw e;
     }
 }
 
-function buildQuery(userModel, location, query) {  // todo Terms need to be taken from userModel
+function buildQuery(price, distancePreferred, location, query) {
     return {
         term: query,
         latitude: location.latitude,
         longitude: location.longitude,
-        price: userModel.price,
-        // open_now: true,
-        radius: Math.floor(userModel.distancePreferred * milesToMeters),
+        price: price,
+        open_now: true,
+        radius: Math.floor(distancePreferred * milesToMeters),
         categories: 'restaurants',
         limit: 4,
     };
