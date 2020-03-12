@@ -36,20 +36,8 @@ public class JSON {
         if (file.exists())
             this.json = (new JSON(file)).getJson();
         else {
-            try {
-                URI uri = new URI(json);
-                this.json = toJson(uri);
-            } catch (IllegalArgumentException e) {
-                try {
-                    URI uri = new URI("https://" + json);
-                    this.json = toJson(uri);
-                } catch (URISyntaxException u) {
-                    this.json = toJson(json);
-                }
-            } catch (URISyntaxException e) {
                 this.json = toJson(json);
             }
-        }
     }
     public JSON(URI uri){
         this();

@@ -16,6 +16,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.foodie_friend.SwipingActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,6 +46,7 @@ import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -265,8 +267,10 @@ public class SignInActivity extends AppCompatActivity {
             /////////////////////////////////////////
 
             Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
-            this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
-            onCallable();
+            Intent intent = new Intent(this, SwipingActivity.class);
+            startActivity(intent);
+            //this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
+            //onCallable();
         }
     }
 
@@ -321,16 +325,14 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<HttpsCallableResult> task) {
                 if (task.isSuccessful()){
-                    String data = task.getResult().getData().toString();
-                    indicator.setText(data);
+                    HttpsCallableResult result = task.getResult();
+                    List data = (List) result.getData();
                 }
                 else{
                     indicator.setText("Failed");
                 }
             }
         });
-
-
     }
 
     @Override

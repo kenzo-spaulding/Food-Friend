@@ -4,7 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.*;
+
 import android.app.Activity;
+
+import com.example.foodie_friend.frontend.dependencies.JSON;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableReference;
+import com.google.firebase.functions.HttpsCallableResult;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView.*;
 
 import android.content.ClipData;
@@ -30,11 +42,17 @@ import android.widget.Toast;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.foodie_friend.frontend.dependencies.SleepTimer;
 import com.example.foodie_friend.frontend.dependencies.DownloadImage;
@@ -140,13 +158,22 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
     private ArrayAdapter<String> arrayAdapterImg;
     private int i;
     private SwipeFlingAdapterView flingContainer;
+    private ArrayList<HashMap> item = new ArrayList<HashMap>();
 
     private ArrayList<String> str = new ArrayList<>(Arrays.asList("chicken", "beef", "salad", "soup"));
+
+    public HttpsCallableReference callable;
+
+    private TextView textView_ItemName;
+    private TextView textView_ItemDescription;
+    private TextView textView_Question;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swiping);
+
+        onCallable();
 
         imageContents = new ArrayList<>();
         imageContents.add(new RowItem(R.drawable.ic_training_image_background, "FastFood", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png"));
@@ -158,6 +185,10 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
 
         //////////////////////////////////////////////////////
 
+        textView_ItemName = findViewById(R.id.textView_itemName);
+        textView_ItemDescription = findViewById(R.id.textView_itemDescription);
+        textView_Question = findViewById(R.id.textView_question);
+
         arrayAdapterImg = new ArrayAdapter<>(this, R.layout.item_swipe, R.id.textView_card, str);
 
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
@@ -167,9 +198,9 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
         flingContainer.setOnItemClickListener(this);
 
         //Remove when map is finished
-        Intent intent = new Intent(this, ProfileActivity.class);
-        Pair<SwipingActivity, Intent> pair = new Pair<>(this, intent);
-        SleepTimer.delay(5, pair);
+        //Intent intent = new Intent(this, ProfileActivity.class);
+        //Pair<SwipingActivity, Intent> pair = new Pair<>(this, intent);
+        //SleepTimer.delay(5, pair);
     }
 
     @Override
@@ -225,6 +256,47 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
         String message = "Swipe image left to like, swipe right to dislike";
         Toast.makeText(SwipingActivity.this, message, Toast.LENGTH_SHORT).show();
     }
+
+
+    public void onCallable(){
+        /**
+         * This is a runnable multi-threaded overriden function.
+         * If you run something outside this, its not guaranteed
+         * you're signed in until its completed. If you must
+         * be signed in FIRST before continuing on, place the
+         * next line of code inside the "onComplete" method
+         */
+        this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
+        Map<String, Object> day = new HashMap<>();
+        day.put("timeOfDay", 0); // TODO: remember 0 means breakfast
+        day.put("training", true);
+        Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
+
+        firebaseCall.addOnCompleteListener(this, new OnCompleteListener<HttpsCallableResult>() {
+            @Override
+            public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                if (task.isSuccessful()){
+                    HttpsCallableResult result = task.getResult();
+                    Map data = (Map) ((List) result.getData()).get(0);
+                    JSONObject json = null;
+                    json = new JSONObject(data);
+
+                    textView_ItemDescription.setText(json.toString());
+
+
+                    //textView_ItemDescription.setText(description);
+                    //textView_ItemName.setText(restaurantName);
+                    //textView_Question.setText(question);
+                    //textView_ItemDescription.setText(data.toString());
+                }
+                else{
+                    textView_ItemDescription.setText("Failed");
+                }
+            }
+        });
+    }
+
+
 }
 
 
