@@ -9,6 +9,7 @@ package com.interview;
  * It displays the images of logos from an API and the results from the index.
  */
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,8 +107,25 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
     @Override
     public void OnItemClick(int i) {
-        //Intent intent = new Intent(this, MapsActivity.class);
-        //logos.get(i);
-        //startActivity(intent);
+        Intent intent = new Intent(this, MapsActivity.class);
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString("name", jsonList.get(i).getString("name"));
+            bundle.putString("image_url", jsonList.get(i).getString("image_url"));
+            bundle.putString("review_count", jsonList.get(i).getString("review_count"));
+            bundle.putString("rating", jsonList.get(i).getString("rating"));
+            bundle.putString("price", jsonList.get(i).getString("price"));
+            bundle.putString("distance", jsonList.get(i).getString("distance"));
+            bundle.putString("review_count", jsonList.get(i).getString("review_count"));
+            bundle.putString("headQuery", jsonList.get(i).getString("headQuery"));
+
+            JSONObject jsn = new JSONObject ((Map) jsonList.get(i).get("location"));
+            bundle.putString("latitude", jsn.getString("latitude"));
+            bundle.putString("longitude", jsn.getString("longitude"));
+
+            intent.putExtras(bundle);
+
+        }catch (Exception e) {}
+        startActivity(intent);
     }
 }

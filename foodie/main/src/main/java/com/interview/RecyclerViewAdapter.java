@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.interview.androidlib.DownloadImage;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -105,7 +107,11 @@ public class RecyclerViewAdapter extends
             e.printStackTrace();
         }
 
-        //new DownloadImage((ImageView) viewHolder.imageView_logo).execute("https://logo.clearbit.com/" + j.getUrl());
+        try {
+            new DownloadImage((ImageView) viewHolder.imageView_logo).execute(j.getString("image_url"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // Returns the total count of items in the list
