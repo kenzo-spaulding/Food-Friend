@@ -61,6 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         textView_Calories = (TextView) findViewById(R.id.textView_Calories);
         textView_Recommend = (TextView) findViewById(R.id.textView_Recommend);
         textView_Options = (TextView) findViewById(R.id.textView_Options);
+        imageView_Logo = (ImageView) findViewById(R.id.imageview_CompanyLogo);
 
         fragment_Map = (View) findViewById(R.id.fragmentmap);
 
@@ -152,6 +153,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String distance = intent.getStringExtra("distance");
                 String phone = intent.getStringExtra("phone");
                 String ratings = intent.getStringExtra("rating");
+                String address1 = intent.getStringExtra("address1");
+                String address2 = intent.getStringExtra("address2");
+                String address_city = intent.getStringExtra("city");
+                String zip_code = intent.getStringExtra("zip_code");
                 Address addr = new Address(Locale.getDefault());
                 addr.setLongitude(longitude);
                 addr.setLatitude(latitude);
@@ -160,11 +165,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 textView_Title.setText(name);
                 textView_Radius.setText(distance);
                 textView_Recommend.setText(snippet);
+                textView_Options.setText(snippet);
+                textView_Calories.setText(address1 + "\n" + address1 + ", " + zip_code);
                 textView_Recommend.setText(snippet);
-                textView_Radius.setText(distance);
-                textView_Recommend.setText(snippet);
-                if (image_url != null)
+                try{
                     new DownloadImage(imageView_Logo).execute(image_url);
+                }catch (Exception e) {}
 
             } catch (Exception e) {e.printStackTrace();}
         }
