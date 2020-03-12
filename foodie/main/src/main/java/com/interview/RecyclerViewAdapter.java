@@ -55,7 +55,7 @@ public class RecyclerViewAdapter extends
             textView_FoodMods = (TextView) itemView.findViewById(R.id.textView_FoodMods);
             textView_DrinkName = (TextView) itemView.findViewById(R.id.textView_DrinkName);
             textView_DrinkSize = (TextView) itemView.findViewById(R.id.textView_DrinkSize);
-            textView_DrinkMods = (TextView) itemView.findViewById(R.id.textView_FoodMods);
+            textView_DrinkMods = (TextView) itemView.findViewById(R.id.textView_DrinkMods);
 
             itemView.setOnClickListener(this);
         }
@@ -103,25 +103,25 @@ public class RecyclerViewAdapter extends
         }
 
         try {
-            viewHolder.textView_FoodSize.setText(j.getString("price"));
+            viewHolder.textView_FoodSize.setText(j.getString("headQuery"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         try {
-            viewHolder.textView_FoodMods.setText(j.getString("rating"));
+            viewHolder.textView_FoodMods.setText((j.getString("is_closed").equals("true")) ? "Closed" : "Open");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         try {
-            viewHolder.textView_DrinkName.setText(j.getString("headQuery"));
+            viewHolder.textView_DrinkName.setText("Miles " + String.format("%.2f", Double.parseDouble(j.getString("distance"))));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         try {
-            viewHolder.textView_DrinkSize.setText((j.getBoolean("isClosed")) ? "Closed" : "Open");
+            viewHolder.textView_DrinkSize.setText("Rating: " + j.getString("rating"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -119,9 +119,15 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
             bundle.putString("review_count", jsonList.get(i).getString("review_count"));
             bundle.putString("headQuery", jsonList.get(i).getString("headQuery"));
 
-            JSONObject jsn = new JSONObject ((Map) jsonList.get(i).get("location"));
-            bundle.putString("latitude", jsn.getString("latitude"));
-            bundle.putString("longitude", jsn.getString("longitude"));
+            JSONObject jsn = new JSONObject ((Map) jsonList.get(i).get("coordinates"));
+            bundle.putDouble("latitude", Double.parseDouble(jsn.getString("latitude")));
+            bundle.putDouble("longitude", Double.parseDouble(jsn.getString("longitude")));
+
+            JSONObject jsn2 = new JSONObject ((Map) jsonList.get(i).get("location"));
+            bundle.putString("address1", jsn.getString("address1"));
+            bundle.putString("address2", jsn.getString("address2"));
+            bundle.putString("city", jsn.getString("city"));
+            bundle.putString("zip_code", jsn.getString("zip_code"));
 
             intent.putExtras(bundle);
 
