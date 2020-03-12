@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.interview.androidlib.DownloadImage;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,7 +55,7 @@ public class RecyclerViewAdapter extends
             textView_FoodMods = (TextView) itemView.findViewById(R.id.textView_FoodMods);
             textView_DrinkName = (TextView) itemView.findViewById(R.id.textView_DrinkName);
             textView_DrinkSize = (TextView) itemView.findViewById(R.id.textView_DrinkSize);
-            textView_DrinkMods = (TextView) itemView.findViewById(R.id.textView_FoodMods);
+            textView_DrinkMods = (TextView) itemView.findViewById(R.id.textView_DrinkMods);
 
             itemView.setOnClickListener(this);
         }
@@ -99,13 +101,42 @@ public class RecyclerViewAdapter extends
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         try {
-            viewHolder.textView_DrinkName.setText(j.getString("price"));
+            viewHolder.textView_FoodSize.setText(j.getString("headQuery"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        //new DownloadImage((ImageView) viewHolder.imageView_logo).execute("https://logo.clearbit.com/" + j.getUrl());
+        try {
+            viewHolder.textView_FoodMods.setText((j.getString("is_closed").equals("true")) ? "Closed" : "Open");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            viewHolder.textView_DrinkName.setText("Miles " + String.format("%.2f", Double.parseDouble(j.getString("distance"))));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            viewHolder.textView_DrinkSize.setText("Rating: " + j.getString("rating"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            viewHolder.textView_DrinkMods.setText(j.getString("phone"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            new DownloadImage((ImageView) viewHolder.imageView_logo).execute(j.getString("image_url"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // Returns the total count of items in the list

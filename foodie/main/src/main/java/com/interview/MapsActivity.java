@@ -145,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 double longitude = intent.getDoubleExtra("longitude", 0.0);
                 double latitude = intent.getDoubleExtra("latitude", 0.0);
                 String name = intent.getStringExtra("name");
-                String snippet = intent.getStringExtra("snippet");
+                String snippet = intent.getStringExtra("headQuery");
                 String image_url = intent.getStringExtra("image_url");
                 Address addr = new Address(Locale.getDefault());
                 addr.setLongitude(longitude);
