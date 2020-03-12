@@ -68,22 +68,6 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.75" />
 
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline5"
-            app:layout_constraintEnd_toStartOf="@+id/guideline6"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/imageView_Logo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_launcher_background"
-                 />
-        </FrameLayout>
-
         <TextView
             android:id="@+id/textView_Title"
             android:layout_width="0dp"
@@ -185,7 +169,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
             app:layout_constraintTop_toTopOf="@+id/guideline8"
-            map:layout_constraintEnd_toStartOf="@+id/guideline7" />
+            map:layout_constraintEnd_toStartOf="@+id/guideline7"
+            map:layout_constraintHorizontal_bias="1.0"
+            map:layout_constraintVertical_bias="0.482" />
 
         <Button
             android:id="@+id/button"
