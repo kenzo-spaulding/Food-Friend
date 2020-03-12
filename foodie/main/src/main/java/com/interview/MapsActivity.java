@@ -145,8 +145,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (bundle != null){
             try {
                 Intent intent = getIntent();
-                double longitude = intent.getDoubleExtra("longitude", 0.0);
-                double latitude = intent.getDoubleExtra("latitude", 0.0);
+                String longitude = intent.getStringExtra("longitude");
+                String latitude = intent.getStringExtra("latitude");
                 String name = intent.getStringExtra("name");
                 String snippet = intent.getStringExtra("headQuery");
                 String image_url = intent.getStringExtra("image_url");
@@ -158,9 +158,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String address_city = intent.getStringExtra("city");
                 String zip_code = intent.getStringExtra("zip_code");
                 Address addr = new Address(Locale.getDefault());
-                addr.setLongitude(longitude);
-                addr.setLatitude(latitude);
+                addr.setLongitude(Double.parseDouble(longitude));
+                addr.setLatitude(Double.parseDouble(latitude));
                 addMarker(addr, name, snippet);
+                moveCamera(addr);
 
                 textView_Title.setText(name);
                 textView_Radius.setText(String.format("%.2f", Double.parseDouble(distance)) + " miles");
@@ -168,13 +169,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 textView_Options.setText(phone);
                 textView_Calories.setText(address1 + "\n" + address_city + ", " + zip_code);
                 textView_Recommend.setText(snippet);
-                new DownloadImage(imageView_Logo).execute(image_url);
 
             } catch (Exception e) {e.printStackTrace();}
-        }
-        if (location != null) {
-            addMarker(address, city);
-            moveCamera(address);
         }
     }
 
