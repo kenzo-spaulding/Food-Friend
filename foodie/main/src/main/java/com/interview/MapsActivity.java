@@ -47,11 +47,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //////////  Backend Variables   ////////////////////////////////////////
     private GoogleMap mMap;
     private GPS gps;
+    private Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        bundle = getIntent().getExtras();
 
         //////  Layout Variables Assigned    //////////////////////////////
         textView_Title = (TextView) findViewById(R.id.textView_Title);
@@ -139,7 +141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Address address = gps.getLastKnownAddress();
         String city = (address == null) ? "Current Location" : "Current Location in " + address.getLocality();
-        if (getIntent().getExtras() != null){
+        if (bundle != null){
             try {
                 Intent intent = getIntent();
                 double longitude = intent.getDoubleExtra("longitude", 0.0);
@@ -147,15 +149,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String name = intent.getStringExtra("name");
                 String snippet = intent.getStringExtra("headQuery");
                 String image_url = intent.getStringExtra("image_url");
+                String distance = intent.getStringExtra("distance");
+                String phone = intent.getStringExtra("phone");
+                String ratings = intent.getStringExtra("rating");
                 Address addr = new Address(Locale.getDefault());
                 addr.setLongitude(longitude);
                 addr.setLatitude(latitude);
                 addMarker(addr, name, snippet);
 
                 textView_Title.setText(name);
-                float[] results = new float[20];
-                Location.distanceBetween(address.getLatitude(), address.getLongitude(), addr.getLatitude(), addr.getLongitude(), results);
-                textView_Radius.setText(String.format("%.2f", Float.toString(results[0])));
+                textView_Radius.setText(distance);
+                textView_Recommend.setText(snippet);
+                textView_Recommend.setText(snippet);
+                textView_Radius.setText(distance);
                 textView_Recommend.setText(snippet);
                 if (image_url != null)
                     new DownloadImage(imageView_Logo).execute(image_url);

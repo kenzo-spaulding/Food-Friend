@@ -108,8 +108,8 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
     @Override
     public void OnItemClick(int i) {
         Intent intent = new Intent(this, MapsActivity.class);
+        Bundle bundle = new Bundle();
         try {
-            Bundle bundle = new Bundle();
             bundle.putString("name", jsonList.get(i).getString("name"));
             bundle.putString("image_url", jsonList.get(i).getString("image_url"));
             bundle.putString("review_count", jsonList.get(i).getString("review_count"));
@@ -119,19 +119,18 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
             bundle.putString("review_count", jsonList.get(i).getString("review_count"));
             bundle.putString("headQuery", jsonList.get(i).getString("headQuery"));
 
-            JSONObject jsn = new JSONObject ((Map) jsonList.get(i).get("coordinates"));
-            bundle.putDouble("latitude", Double.parseDouble(jsn.getString("latitude")));
-            bundle.putDouble("longitude", Double.parseDouble(jsn.getString("longitude")));
+            JSONObject jsn = (JSONObject) jsonList.get(i).get("coordinates");
+            bundle.putString("latitude", jsn.getString("latitude"));
+            bundle.putString("longitude", jsn.getString("longitude"));
 
-            JSONObject jsn2 = new JSONObject ((Map) jsonList.get(i).get("location"));
-            bundle.putString("address1", jsn.getString("address1"));
-            bundle.putString("address2", jsn.getString("address2"));
-            bundle.putString("city", jsn.getString("city"));
-            bundle.putString("zip_code", jsn.getString("zip_code"));
-
-            intent.putExtras(bundle);
+            JSONObject jsn2 = (JSONObject) jsonList.get(i).get("location");
+            bundle.putString("address1", jsn2.getString("address1"));
+            bundle.putString("address2", jsn2.getString("address2"));
+            bundle.putString("city", jsn2.getString("city"));
+            bundle.putString("zip_code", jsn2.getString("zip_code"));
 
         }catch (Exception e) {}
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 }
