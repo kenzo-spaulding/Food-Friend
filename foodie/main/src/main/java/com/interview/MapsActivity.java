@@ -163,10 +163,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 addMarker(addr, name, snippet);
 
                 textView_Title.setText(name);
-                textView_Radius.setText(distance);
+                textView_Radius.setText(String.format("%.2f", Double.parseDouble(distance)) + " miles");
                 textView_Recommend.setText(snippet);
-                textView_Options.setText(snippet);
-                textView_Calories.setText(address1 + "\n" + address1 + ", " + zip_code);
+                textView_Options.setText(phone);
+                textView_Calories.setText(address1 + "\n" + address_city + ", " + zip_code);
                 textView_Recommend.setText(snippet);
                 new DownloadImage(imageView_Logo).execute(image_url);
 
@@ -180,6 +180,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void onClick_Go(View view){
         Intent intent = new Intent(this, RecyclerViewActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClick_Train(View view){
+        Intent intent = new Intent(this, SwipeActivity.class);
         startActivity(intent);
     }
 
