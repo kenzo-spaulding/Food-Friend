@@ -1,2 +1,2 @@
-include ':app'
+include ':app', ':signin', ':swipe', ':lib', ':main', ':androidlib', ':navigation', ':menu', ':profile', ':settings', ':recyclerview', ':scrollview'
 rootProject.name='foodie-friend'
