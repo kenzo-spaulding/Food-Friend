@@ -126,8 +126,9 @@ exports.updateUserPrefs = functions.https.onCall(async (information, context) =>
         let k = resp.toJSON().k;
         console.log('data: ' + JSON.stringify(data));
         let winner = [information.winner, data[information.winner].score];
+        let subWinner = undefined;
         if (information.subWinner) {
-            let subWinner = [information.subWinner, data[information.winner].subQueries[information.subWinner]];
+            subWinner = [information.subWinner, data[information.winner].subQueries[information.subWinner]];
         }
         let subLosers = [];
         let losers = [];
@@ -168,6 +169,8 @@ async function rankCalculate(winnerName, subWinner, winner, loserNames, subLoser
 
         promises.push(db.child('queryHead').child(winnerName).update({score: winner[1]}));
 
+
+        console.log(subWinner);
         if (subWinner) {
             let subWins = 0;
             let subCount = subLosers.length;
@@ -209,15 +212,17 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
     try {
         let uid = data.uid ? data.uid : context.auth.uid;
         let db = await admin.database().ref('users/' + uid);
-        let restaurantDB = await admin.database().ref('restaurants');
         let userModel = await db.child(data.timeOfDay).once('value', (data) => (data));
         let location = await db.child('location').once('value', (data) => (data));
+        let training = data.training ? data.training : false;
+        console.log(training);
 
         let enRoute = data.enRoute ? data.enRoute : false;
-        let locations = data.route ? data.route : location.toJSON();
+        let locations = data.enRoute ? data.route : location.toJSON();
+
         userModel.distancePreferred = data.weather ? userModel.distancePreferred / 2 : userModel.distancePreferred;
 
-        return await gatherInformation(userModel.toJSON(), locations, enRoute, restaurantDB);
+        return await gatherInformation(userModel.toJSON(), locations, enRoute, training);
 
     } catch (e) {
         console.log("error: " + e);
@@ -225,17 +230,23 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
     }
 });
 
-async function gatherInformation(userModel, locations, enRoute, restaurantDB) {
+async function gatherInformation(userModel, locations, enRoute, training) {
     try {
         let search = Object.entries(userModel.queryHead).sort((a, b) => {
             return b[1].score - a[1].score;
         });
+        console.log(search);
         let promises = [], delay = 0;
-        if (enRoute === true) {
+        if (training) {
+            for (let i = 0; i < 20; i++) {
+                promises.push(getRestaurants(buildQuery(userModel.price, userModel.distancePreferred, locations, search[i][0], 1), search[i][0], undefined, delay, 1));
+                delay += 0.25;
+            }
+        } else if (enRoute === true) {
             locations.forEach((location) => {
                 let distancePreferred = 2;
                 for (let i = 0; i < 3; i++) {
-                    promises.push(getRestaurants(buildQuery(userModel.price, distancePreferred, location, search[i][0]), search[i][0], undefined, delay));
+                    promises.push(getRestaurants(buildQuery(userModel.price, distancePreferred, location, search[i][0], 3), search[i][0], undefined, delay));
                     delay += 0.25;
                 }
             });
@@ -255,18 +266,12 @@ async function gatherInformation(userModel, locations, enRoute, restaurantDB) {
             }
         }
 
-        let restDBItems = await restaurantDB.once('value');
         let responses = await Promise.all(promises), restaurants = [], seenRestaurants = new Set(), rests = 0;
         responses.forEach((resp) => {
             let businesses = JSON.parse(resp.body).businesses;
             businesses.forEach((bus) => {
-                if (!restDBItems.hasChild(bus.id)) {
-                    restaurantDB = restaurantDB.push(bus.id);
-                    restaurantDB.set(bus);
-                }
                 bus.headQuery = resp.headQuery;
                 bus.subQuery = resp.subQuery ? resp.subQuery : resp.subQuery;
-                bus.distance = resp.distance / milesToMeters;
                 if (!seenRestaurants.has(bus.id)) {
                     restaurants.push(bus);
                     seenRestaurants.add(bus.id);
@@ -312,15 +317,28 @@ function getRestaurants(query, headQuery, subQuery, n) {
     }
 }
 
-function buildQuery(price, distancePreferred, location, query) {
-    return {
-        term: query,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        price: price,
-        open_now: true,
-        radius: Math.floor(distancePreferred * milesToMeters),
-        categories: 'restaurants',
-        limit: 4,
-    };
+function buildQuery(price, distancePreferred, location, query, num) {
+    if (num) {
+        return {
+            term: query,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            price: price,
+            open_now: true,
+            radius: Math.floor(distancePreferred * milesToMeters),
+            categories: 'restaurants',
+            limit: num,
+        };
+    } else {
+        return {
+            term: query,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            price: price,
+            open_now: true,
+            radius: Math.floor(distancePreferred * milesToMeters),
+            categories: 'restaurants',
+            limit: 4,
+        };
+    }
 }
