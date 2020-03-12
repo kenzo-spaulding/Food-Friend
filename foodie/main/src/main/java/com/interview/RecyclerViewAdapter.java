@@ -101,8 +101,27 @@ public class RecyclerViewAdapter extends
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         try {
-            viewHolder.textView_DrinkName.setText(j.getString("price"));
+            viewHolder.textView_FoodSize.setText(j.getString("price"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            viewHolder.textView_FoodMods.setText(j.getString("rating"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            viewHolder.textView_DrinkName.setText(j.getString("headQuery"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            viewHolder.textView_DrinkSize.setText((j.getBoolean("isClosed")) ? "Closed" : "Open");
         } catch (JSONException e) {
             e.printStackTrace();
         }
