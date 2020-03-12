@@ -175,13 +175,25 @@
 
         <Button
             android:id="@+id/button"
-            android:layout_width="52dp"
-            android:layout_height="42dp"
+            android:layout_width="60dp"
+            android:layout_height="37dp"
             android:onClick="onClick_Go"
             android:text="Go"
+            map:layout_constraintBottom_toTopOf="@+id/guideline5"
+            map:layout_constraintEnd_toStartOf="@+id/guideline6"
+            map:layout_constraintHorizontal_bias="0.5"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/button_Train"
+            android:layout_width="85dp"
+            android:layout_height="42dp"
+            android:onClick="onClick_Train"
+            android:text="Train"
             map:layout_constraintBottom_toBottomOf="parent"
             map:layout_constraintEnd_toEndOf="parent"
-            map:layout_constraintStart_toEndOf="@+id/textView_Calories" />
+            map:layout_constraintStart_toStartOf="@+id/guideline7" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

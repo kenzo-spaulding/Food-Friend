@@ -1,5 +1,6 @@
 package com.interview;
 
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -139,6 +140,11 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                 }
             }
         });
+    }
+
+    public void onClick_ListView(View view){
+        Intent intent = new Intent(this, RecyclerViewActivity.class);
+        startActivity(intent);
     }
 
     @Override
