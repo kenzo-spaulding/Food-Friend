@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,7 +43,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
     private RecyclerView recyclerView_Frame;
 
     //////////  Backend Variables   ////////////////////////////////////////
-    ArrayList<JSONObject> jsonList;
+    ArrayList<JSONObject> jsonList = new ArrayList<>();
 
     private FirebaseDatabase database;
     private DatabaseReference myRef;
@@ -54,6 +55,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
         FirebaseApp.initializeApp(this);
 
         //////  Layout Variables Assigned    //////////////////////////////
+
         recyclerView_Frame = (RecyclerView) findViewById(R.id.recyclerViewFrame);
         onCallable();
     }
@@ -75,14 +77,11 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
             @Override
             public void onComplete(@NonNull Task<HttpsCallableResult> task) {
                 if (task.isSuccessful()){
-                    String str = task.getResult().getData().toString();
-                    try {
-                        JSONObject json = new JSONObject(str);
-                        jsonList.add(json);
-                        startListView();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    HttpsCallableResult result = task.getResult();
+                    List v = ((List) result.getData());
+                    for (int i = 0; i < v.size(); i++)
+                        jsonList.add(new JSONObject((Map) v.get(i)));
+                    startListView();
                 }
                 else{
 
