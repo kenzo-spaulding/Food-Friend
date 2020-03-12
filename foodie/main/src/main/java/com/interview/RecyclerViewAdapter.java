@@ -127,6 +127,12 @@ public class RecyclerViewAdapter extends
         }
 
         try {
+            viewHolder.textView_DrinkMods.setText(j.getString("phone"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
             new DownloadImage((ImageView) viewHolder.imageView_logo).execute(j.getString("image_url"));
         } catch (JSONException e) {
             e.printStackTrace();
