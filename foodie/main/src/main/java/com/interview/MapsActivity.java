@@ -47,11 +47,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //////////  Backend Variables   ////////////////////////////////////////
     private GoogleMap mMap;
     private GPS gps;
+    private Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        bundle = getIntent().getExtras();
 
         //////  Layout Variables Assigned    //////////////////////////////
         textView_Title = (TextView) findViewById(R.id.textView_Title);
@@ -59,6 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         textView_Calories = (TextView) findViewById(R.id.textView_Calories);
         textView_Recommend = (TextView) findViewById(R.id.textView_Recommend);
         textView_Options = (TextView) findViewById(R.id.textView_Options);
+        imageView_Logo = (ImageView) findViewById(R.id.imageview_CompanyLogo);
 
         fragment_Map = (View) findViewById(R.id.fragmentmap);
 
@@ -139,7 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Address address = gps.getLastKnownAddress();
         String city = (address == null) ? "Current Location" : "Current Location in " + address.getLocality();
-        if (getIntent().getExtras() != null){
+        if (bundle != null){
             try {
                 Intent intent = getIntent();
                 double longitude = intent.getDoubleExtra("longitude", 0.0);
@@ -147,18 +150,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String name = intent.getStringExtra("name");
                 String snippet = intent.getStringExtra("headQuery");
                 String image_url = intent.getStringExtra("image_url");
+                String distance = intent.getStringExtra("distance");
+                String phone = intent.getStringExtra("phone");
+                String ratings = intent.getStringExtra("rating");
+                String address1 = intent.getStringExtra("address1");
+                String address2 = intent.getStringExtra("address2");
+                String address_city = intent.getStringExtra("city");
+                String zip_code = intent.getStringExtra("zip_code");
                 Address addr = new Address(Locale.getDefault());
                 addr.setLongitude(longitude);
                 addr.setLatitude(latitude);
                 addMarker(addr, name, snippet);
 
                 textView_Title.setText(name);
-                float[] results = new float[20];
-                Location.distanceBetween(address.getLatitude(), address.getLongitude(), addr.getLatitude(), addr.getLongitude(), results);
-                textView_Radius.setText(String.format("%.2f", Float.toString(results[0])));
+                textView_Radius.setText(distance);
                 textView_Recommend.setText(snippet);
-                if (image_url != null)
-                    new DownloadImage(imageView_Logo).execute(image_url);
+                textView_Options.setText(snippet);
+                textView_Calories.setText(address1 + "\n" + address1 + ", " + zip_code);
+                textView_Recommend.setText(snippet);
+                new DownloadImage(imageView_Logo).execute(image_url);
 
             } catch (Exception e) {e.printStackTrace();}
         }
@@ -166,6 +176,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             addMarker(address, city);
             moveCamera(address);
         }
+    }
+
+    public void onClick_Go(View view){
+        Intent intent = new Intent(this, RecyclerViewActivity.class);
+        startActivity(intent);
     }
 
     @Override
