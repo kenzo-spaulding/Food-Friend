@@ -77,9 +77,8 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
                 if (task.isSuccessful()){
                     String str = task.getResult().getData().toString();
                     try {
-                        JSONArray json = new JSONArray(str);
-                        for (int i = 0; i < json.length(); i++)
-                            jsonList.add(json.getJSONObject(i));
+                        JSONObject json = new JSONObject(str);
+                        jsonList.add(json);
                         startListView();
                     } catch (JSONException e) {
                         e.printStackTrace();
