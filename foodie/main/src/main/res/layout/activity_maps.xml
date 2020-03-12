@@ -86,7 +86,7 @@
 
         <TextView
             android:id="@+id/textView_Title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Restaurant Title"
             android:textColor="#686868"
@@ -99,9 +99,10 @@
 
         <TextView
             android:id="@+id/textView_Radius"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="miles"
+            android:textAlignment="textEnd"
             android:textColor="#595959"
             app:layout_constraintBottom_toTopOf="@+id/guideline5"
             app:layout_constraintEnd_toEndOf="parent"
@@ -146,7 +147,7 @@
             android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calories"
+            android:text="Location"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="parent"
@@ -154,9 +155,10 @@
 
         <TextView
             android:id="@+id/textView_Recommend"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Order the protein style burger"
+            android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/guideline9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
@@ -164,9 +166,10 @@
 
         <TextView
             android:id="@+id/textView_Options"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="4x4, 3x3, 2x2, 1x1, No Cheese"
+            android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/guideline8"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
@@ -174,13 +177,25 @@
 
         <TextView
             android:id="@+id/textView_Calories"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="910, 710, 520, 320, 260"
+            android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toTopOf="@+id/guideline8" />
+            app:layout_constraintTop_toTopOf="@+id/guideline8"
+            map:layout_constraintEnd_toStartOf="@+id/guideline7" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="52dp"
+            android:layout_height="42dp"
+            android:onClick="onClick_Go"
+            android:text="Go"
+            map:layout_constraintBottom_toBottomOf="parent"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintStart_toEndOf="@+id/textView_Calories" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

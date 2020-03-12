@@ -168,9 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 textView_Options.setText(snippet);
                 textView_Calories.setText(address1 + "\n" + address1 + ", " + zip_code);
                 textView_Recommend.setText(snippet);
-                try{
-                    new DownloadImage(imageView_Logo).execute(image_url);
-                }catch (Exception e) {}
+                new DownloadImage(imageView_Logo).execute(image_url);
 
             } catch (Exception e) {e.printStackTrace();}
         }
@@ -178,6 +176,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             addMarker(address, city);
             moveCamera(address);
         }
+    }
+
+    public void onClick_Go(View view){
+        Intent intent = new Intent(this, RecyclerViewActivity.class);
+        startActivity(intent);
     }
 
     @Override

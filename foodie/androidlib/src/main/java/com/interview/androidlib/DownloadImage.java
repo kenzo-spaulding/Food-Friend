@@ -51,6 +51,11 @@ public class DownloadImage extends AsyncTask<String, Void, Bitmap> {
 
     protected void onPostExecute(Bitmap map){
         if (map != null)
-            bitMap.setImageBitmap(map);
+            try {
+                bitMap.setImageBitmap(map);
+            }catch (Exception e)
+            {
+
+            }
     }
 }
