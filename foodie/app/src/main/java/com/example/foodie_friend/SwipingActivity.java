@@ -283,7 +283,6 @@ public class SwipingActivity extends AppCompatActivity implements onFlingListene
 
                     textView_ItemDescription.setText(json.toString());
 
-
                     //textView_ItemDescription.setText(description);
                     //textView_ItemName.setText(restaurantName);
                     //textView_Question.setText(question);
