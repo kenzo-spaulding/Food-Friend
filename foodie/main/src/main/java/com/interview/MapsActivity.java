@@ -179,8 +179,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-    public void onClick_Train(View view){
-        Intent intent = new Intent(this, SwipeActivity.class);
+    public void onClick_Profile(View view){
+        Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 
