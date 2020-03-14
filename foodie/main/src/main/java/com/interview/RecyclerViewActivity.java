@@ -29,8 +29,12 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.OAuthCredential;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
@@ -80,13 +84,17 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
         textView_Greeting.setText(Authorization.user.getEmail());
         final Intent intent = new Intent(this, LoginActivity.class);
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseAuth auth = FirebaseAuth.getInstance();
+        final FirebaseUser user = auth.getCurrentUser();
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
         button_DeleteAccount.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 //TODO: delete account
-                if (authorization != null || getIntent().getExtras() != null || user != null) {
+                if (user != null) {
+
                     user.delete()
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -94,6 +102,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
                                     if (task.isSuccessful()) {
                                         textView_Greeting.setText("Deleted :)");
                                         try {
+                                            ref.child("users").child(user.getUid()).removeValue();
                                             Thread.sleep(1000);
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
@@ -111,6 +120,10 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
 
         onCallable();
+    }
+
+    public void remove(String uid){
+
     }
 
     public void onCallable(){

@@ -68,8 +68,8 @@ public class LoginActivity extends AppCompatActivity {
         assignLayoutVariables();
 
         //TODO: remove the next line of code when ready to deploy
-        editText_Username.setText("test@uci.edu");
-        editText_Password.setText("123456");
+        //editText_Username.setText("");
+        //editText_Password.setText("");
 
         if (getIntent().getExtras() != null)
         {
