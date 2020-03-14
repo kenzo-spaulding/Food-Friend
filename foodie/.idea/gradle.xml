@@ -14,14 +14,6 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/lib" />
             <option value="$PROJECT_DIR$/main" />
-            <option value="$PROJECT_DIR$/menu" />
-            <option value="$PROJECT_DIR$/navigation" />
-            <option value="$PROJECT_DIR$/profile" />
-            <option value="$PROJECT_DIR$/recyclerview" />
-            <option value="$PROJECT_DIR$/scrollview" />
-            <option value="$PROJECT_DIR$/settings" />
-            <option value="$PROJECT_DIR$/signin" />
-            <option value="$PROJECT_DIR$/swipe" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

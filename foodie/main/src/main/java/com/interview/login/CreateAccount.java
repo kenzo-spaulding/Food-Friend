@@ -18,12 +18,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.interview.R;
 
 public class CreateAccount extends AppCompatActivity {
-
-    FirebaseAuth mFirebaseAuth;
     TextView indicator;
     EditText email;
     EditText password;
     Button button;
+    Authorization authorization;
 
 
     @Override
@@ -35,9 +34,6 @@ public class CreateAccount extends AppCompatActivity {
         email = (EditText) findViewById(R.id.editText_Email);
         password = (EditText) findViewById(R.id.editText_Password);
         button = (Button) findViewById(R.id.button_CreateAccount);
-
-
-        mFirebaseAuth = FirebaseAuth.getInstance();
     }
 
 
@@ -47,13 +43,13 @@ public class CreateAccount extends AppCompatActivity {
             return;
         }
         final Intent intent = new Intent(this, LoginActivity.class);
-        mFirebaseAuth.createUserWithEmailAndPassword(email.getText().toString(),
+        authorization.mFirebaseAuth.createUserWithEmailAndPassword(email.getText().toString(),
                 password.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
-                    FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                    FirebaseUser user = authorization.mFirebaseAuth.getCurrentUser();
                     indicator.setText("Worked and created");
                     Bundle bundle = new Bundle();
                     bundle.putString("message", "Please authenticate by re-entering your email & password");

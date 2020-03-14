@@ -180,8 +180,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void onClick_Train(View view){
-        Intent intent = new Intent(this, SwipeActivity.class);
-        startActivity(intent);
+
     }
 
     @Override

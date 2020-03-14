@@ -11,21 +11,33 @@ package com.interview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.OAuthCredential;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.interview.androidlib.Firebase;
 import com.interview.lib.DateTime;
+import com.interview.login.Authorization;
+import com.interview.login.LoginActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,12 +55,13 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
     //////////  LAYOUT VARIABLES  //////////////////////////////////////////
     private RecyclerView recyclerView_Frame;
+    private Button button_DeleteAccount;
+    private TextView textView_Greeting;
+    private Authorization authorization = null;
 
     //////////  Backend Variables   ////////////////////////////////////////
     ArrayList<JSONObject> jsonList = new ArrayList<>();
 
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
     public HttpsCallableReference callable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,23 +69,63 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
         setContentView(R.layout.activity_recycler_view);
         FirebaseApp.initializeApp(this);
 
+        authorization = (Authorization) getIntent().getSerializableExtra("authorization");
+
         //////  Layout Variables Assigned    //////////////////////////////
 
         recyclerView_Frame = (RecyclerView) findViewById(R.id.recyclerViewFrame);
+        textView_Greeting = (TextView) findViewById(R.id.textView_Greeting);
+        button_DeleteAccount = (Button) findViewById(R.id.button_DeleteAccount);
+
+
+        textView_Greeting.setText(Authorization.user.getEmail());
+        final Intent intent = new Intent(this, LoginActivity.class);
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        button_DeleteAccount.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //TODO: delete account
+                if (authorization != null || getIntent().getExtras() != null || user != null) {
+                    user.delete()
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        textView_Greeting.setText("Deleted :)");
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        startActivity(intent);
+                                    }
+                                }
+                            });
+                }
+                else{
+                    textView_Greeting.setText("Unable to remove account. 3");
+                }
+            }
+        });
+
+
         onCallable();
     }
 
     public void onCallable(){
         /**
+         * FIREBASE CALLING
+         *
          * This is a runnable multi-threaded overriden function.
          * If you run something outside this, its not guaranteed
          * you're signed in until its completed. If you must
          * be signed in FIRST before continuing on, place the
          * next line of code inside the "onComplete" method
          */
-        this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
+        this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations"); // gets from Firebase some restaurants
         Map<String, Object> day = new HashMap<>();
-        day.put("timeOfDay", DateTime.timeOfDayInt()); // TODO: remember 0 means breakfast
+        day.put("timeOfDay", DateTime.timeOfDayInt()); // calls a document from Firebase a subdocument
         Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
 
         firebaseCall.addOnCompleteListener(this, new OnCompleteListener<HttpsCallableResult>() {
