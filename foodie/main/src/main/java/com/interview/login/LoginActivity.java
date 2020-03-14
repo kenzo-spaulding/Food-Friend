@@ -255,10 +255,6 @@ public class LoginActivity extends AppCompatActivity {
                 RC_SIGN_IN);
     }
 
-    public void onClick_KeepMeSignedIn(View view){
-        //TODO: set sign in options to stay signed in
-    }
-
     public void updateUI(FirebaseUser user){
         if (user != null) {
             String welcome = getString(R.string.welcome) + user.getDisplayName();
