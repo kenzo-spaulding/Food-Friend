@@ -2,7 +2,7 @@ package com.interview;
 
 /**
  * @author Mauricio Lomeli
- * @version Feburary, 2020
+ * @version February, 2020
  *
  * This activity is generates the list of the recommendation results.
  * It makes use of the RecyclerView to display results without pagination.

@@ -1,5 +1,9 @@
 package com.interview.login;
-
+/**
+ * @author Mauricio Lomeli
+ * @version March, 2020
+ *
+ */
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;

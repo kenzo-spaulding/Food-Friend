@@ -1,5 +1,9 @@
 package com.interview.login;
-
+/**
+ * @author Mauricio Lomeli
+ * @version March, 2020
+ *
+ */
 import androidx.annotation.Nullable;
 
 /**

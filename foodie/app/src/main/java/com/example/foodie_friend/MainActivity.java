@@ -40,9 +40,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tTest = (TextView) findViewById(R.id.word);
-        zTest = (Button) findViewById(R.id.but);
-        mTest = (Button) findViewById(R.id.test);
         mFirebaseAuth = FirebaseAuth.getInstance();
     }
 
@@ -51,32 +48,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mConditionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String text = dataSnapshot.getValue(String.class);
-                tTest.setText(text);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
-
-        mTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mConditionRef.setValue("Changed!");
-            }
-        });
-
-        zTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mConditionRef.setValue("Chips!");
-            }
-        });
 
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {

@@ -1,7 +1,7 @@
 package com.interview;
 /**
  * @author Mauricio Lomeli
- * @version Feburary, 2020
+ * @version March, 2020
  *
  * This activity begins the GoogleMaps activity. It will connect to
  * Google's maps and provides an interactive map for the user to view

@@ -1,5 +1,9 @@
 package com.interview.login;
-
+/**
+ * @author Mauricio Lomeli
+ * @version March, 2020
+ *
+ */
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

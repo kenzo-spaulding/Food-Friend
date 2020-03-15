@@ -1,5 +1,9 @@
 package com.interview;
-
+/**
+ * @author Mauricio Lomeli
+ * @version March, 2020
+ *
+ */
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
