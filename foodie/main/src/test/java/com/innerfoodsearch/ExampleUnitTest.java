@@ -1,4 +1,4 @@
-package com.innerfoodsearch.menu;
+package com.innerfoodsearch;
 
 import org.junit.Test;
 

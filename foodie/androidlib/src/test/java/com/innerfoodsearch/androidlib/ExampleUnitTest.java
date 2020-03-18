@@ -1,4 +1,4 @@
-package com.innerfoodsearch.menu;
+package com.innerfoodsearch.androidlib;
 
 import org.junit.Test;
 

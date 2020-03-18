@@ -1,4 +1,4 @@
-package com.interview.menu;
+package com.innerfoodsearch.menu;
 
 import android.os.Bundle;
 import android.view.View;

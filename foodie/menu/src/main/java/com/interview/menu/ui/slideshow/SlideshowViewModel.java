@@ -1,4 +1,4 @@
-package com.interview.menu.ui.slideshow;
+package com.innerfoodsearch.menu.ui.slideshow;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

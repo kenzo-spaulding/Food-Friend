@@ -1,4 +1,4 @@
-package com.innerfoodsearch.menu;
+package com.innerfoodsearch;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.interview.menu", appContext.getPackageName());
+        assertEquals("com.interview", appContext.getPackageName());
     }
 }

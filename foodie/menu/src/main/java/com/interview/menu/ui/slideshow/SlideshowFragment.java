@@ -1,4 +1,4 @@
-package com.interview.menu.ui.slideshow;
+package com.innerfoodsearch.menu.ui.slideshow;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.interview.menu.R;
+import com.innerfoodsearch.menu.R;
 
 public class SlideshowFragment extends Fragment {
 
