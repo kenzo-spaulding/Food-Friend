@@ -1,4 +1,4 @@
-package com.innerfoodsearch.menu.ui.gallery;
+package com.innerfoodssearch.menu.ui.gallery;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.innerfoodsearch.menu.R;
+import com.innerfoodssearch.menu.R;
 
 public class GalleryFragment extends Fragment {
 

@@ -1,4 +1,4 @@
-package com.innerfoodsearch.menu.ui.home;
+package com.innerfoodssearch.menu.ui.home;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

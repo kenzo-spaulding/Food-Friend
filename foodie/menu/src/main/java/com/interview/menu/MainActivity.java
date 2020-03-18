@@ -1,4 +1,4 @@
-package com.innerfoodsearch.menu;
+package com.innerfoodssearch.menu;
 
 import android.os.Bundle;
 import android.view.View;
