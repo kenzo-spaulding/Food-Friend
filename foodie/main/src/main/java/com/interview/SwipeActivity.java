@@ -203,7 +203,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                             }
                         }
                         progressBar_Swipe.setVisibility(View.INVISIBLE);
-                        i += v.size();
+                        i = str.size() + v.size();
                         arrayAdapterImg.notifyDataSetChanged();
                         flingContainer.getTopCardListener().selectLeft();
                         enableAllInputs();
@@ -246,7 +246,6 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         }
 
         str.remove(0);
-        i--;
         arrayAdapterImg.notifyDataSetChanged();
     }
 
