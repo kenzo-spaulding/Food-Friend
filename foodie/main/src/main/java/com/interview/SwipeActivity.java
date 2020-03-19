@@ -183,11 +183,6 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         });
     }
 
-    public void onClick_ListView(View view){
-        Intent intent = new Intent(this, RecyclerViewActivity.class);
-        startActivity(intent);
-    }
-
     @Override
     public void removeFirstObjectInAdapter() {
         // this is the simplest way to delete an object from the Adapter (/AdapterView)
