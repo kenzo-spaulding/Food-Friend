@@ -276,8 +276,6 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         //str.add(new ImageContent("Food item: ".concat(String.valueOf(i)), "http://logo.clearbit.com/spotify.com?size=60"));
         //TODO: add additional items to the list to render before it ends
         str.add("Almost there...");
-        if (!loading)
-            onCallable();
         arrayAdapterImg.notifyDataSetChanged();
         i++;
     }

@@ -1,6 +1,6 @@
 const yelp_api = require('yelp-fusion');
-// const yelp = yelp_api.client('9sChg8nmLtdalv3Ls2uQVcnnThZCwPhGHSSfkn-0HKST6ksDZmzfn55yV1VBKG32TGE406Y-EAP3wC-h3aqZ7o6Qzsb7-X37piqoLItl0yrEXl8DBcI6I7BcS9EnXnYx');
-const yelp = yelp_api.client('rxW3uXXBPZThSA4XwqLdds0jYTjsQIzBjvTxftJBuliRFgcRe3rhfvRt7S-ZroW6PHeQvSGPJYOKLmHbsfm6dB_7pOUPgj79J9JXJchbgyH3PNhHNAn1iK5YUeRlXnYx');
+const yelp = yelp_api.client('9sChg8nmLtdalv3Ls2uQVcnnThZCwPhGHSSfkn-0HKST6ksDZmzfn55yV1VBKG32TGE406Y-EAP3wC-h3aqZ7o6Qzsb7-X37piqoLItl0yrEXl8DBcI6I7BcS9EnXnYx');
+// const yelp = ;
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const milesToMeters = 1609.34;
@@ -41,7 +41,6 @@ const heads = {
     "Sushi": {"score": 1000, "subQueries": bodies},
     "Breakfast": {"score": 1000, "subQueries": bodies}
 };
-
 
 
 admin.initializeApp({
@@ -102,6 +101,21 @@ exports.updateUserLocation = functions.https.onCall((location, context) => {
         });
 });
 
+// exports.addVisitedRestaurant = functions.https.onCall(async (info, context) => {
+//     try {
+//         let uid = info.uid ? info.uid : context.auth.uid;
+//         let db = await admin.database().ref('users/' + uid + '/' + info.timeOfDay + '/restaurants');
+//         if (!db.hasChild(info.rid)) {
+//             let restaurants = await admin.database().ref('restaurants/' + info.rid).once('value');
+//             db = await db.push(info.rid);
+//             await db.set(restaurants.toJSON());
+//         }
+//     } catch (e) {
+//         console.log(e);
+//         return e;
+//     }
+// });
+
 exports.updateUserPrefs = functions.https.onCall(async (information, context) => {
     console.log('recieved information for updating user preferrences: ' + JSON.stringify(information));
     try {
@@ -112,7 +126,10 @@ exports.updateUserPrefs = functions.https.onCall(async (information, context) =>
         let k = resp.toJSON().k;
         console.log('data: ' + JSON.stringify(data));
         let winner = [information.winner, data[information.winner].score];
-        let subWinner = [information.subWinner, data[information.winner].subQueries[information.subWinner]];
+        let subWinner = undefined;
+        if (information.subWinner) {
+            subWinner = [information.subWinner, data[information.winner].subQueries[information.subWinner]];
+        }
         let subLosers = [];
         let losers = [];
 
@@ -152,24 +169,27 @@ async function rankCalculate(winnerName, subWinner, winner, loserNames, subLoser
 
         promises.push(db.child('queryHead').child(winnerName).update({score: winner[1]}));
 
-        let subWins = 0;
-        let subCount = subLosers.length;
-        subLosers.forEach((loser) => {
-            let p1 = (1.0 / (1.0 + Math.pow(10, (subWinner[1] - loser[1]) / 400)));
-            let p2 = 1 - p1;
 
-            subWins += k * (1 - p1);
-            loser[1] = loser[1] + ((k * (0 - p2)) / subCount);
-        });
+        console.log(subWinner);
+        if (subWinner) {
+            let subWins = 0;
+            let subCount = subLosers.length;
+            subLosers.forEach((loser) => {
+                let p1 = (1.0 / (1.0 + Math.pow(10, (subWinner[1] - loser[1]) / 400)));
+                let p2 = 1 - p1;
 
-        subWinner[1] = subWinner[1] + (subWins / subCount);
+                subWins += k * (1 - p1);
+                loser[1] = loser[1] + ((k * (0 - p2)) / subCount);
+            });
 
-        promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(subWinner[0]).set(subWinner[1]));
+            subWinner[1] = subWinner[1] + (subWins / subCount);
 
-        subLosers.forEach((loser) => {
-            promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(loser[0]).set(loser[1]));
-        });
+            promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(subWinner[0]).set(subWinner[1]));
 
+            subLosers.forEach((loser) => {
+                promises.push(db.child('queryHead').child(winnerName).child('subQueries').child(loser[0]).set(loser[1]));
+            });
+        }
         losers.forEach((loser) => {
             promises.push(db.child('queryHead').child(loser[0]).update({score: loser[1]}));
         });
@@ -194,12 +214,15 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
         let db = await admin.database().ref('users/' + uid);
         let userModel = await db.child(data.timeOfDay).once('value', (data) => (data));
         let location = await db.child('location').once('value', (data) => (data));
+        let training = data.training ? data.training : false;
+        console.log(training);
 
         let enRoute = data.enRoute ? data.enRoute : false;
-        let locations = data.route ? data.route : location.toJSON();
-        userModel.distancePreferred = data.weather ? userModel.distancePreferred/2 : userModel.distancePreferred;
+        let locations = data.enRoute ? data.route : location.toJSON();
 
-        return await gatherInformation(userModel.toJSON(), locations, enRoute);
+        userModel.distancePreferred = data.weather ? userModel.distancePreferred / 2 : userModel.distancePreferred;
+
+        return await gatherInformation(userModel.toJSON(), locations, enRoute, training);
 
     } catch (e) {
         console.log("error: " + e);
@@ -207,21 +230,30 @@ exports.recommendations = functions.https.onCall(async (data, context) => {
     }
 });
 
-async function gatherInformation(userModel, locations, enRoute) {
+async function gatherInformation(userModel, locations, enRoute, training) {
     try {
         let search = Object.entries(userModel.queryHead).sort((a, b) => {
             return b[1].score - a[1].score;
         });
+        console.log(search);
         let promises = [], delay = 0;
-        if (enRoute === true) {
+        if (training) {
+            // yelp = yelp_api.client('9sChg8nmLtdalv3Ls2uQVcnnThZCwPhGHSSfkn-0HKST6ksDZmzfn55yV1VBKG32TGE406Y-EAP3wC-h3aqZ7o6Qzsb7-X37piqoLItl0yrEXl8DBcI6I7BcS9EnXnYx');
+            for (let i = 0; i < 20; i++) {
+                promises.push(getRestaurants(buildQuery(userModel.price, userModel.distancePreferred, locations, search[i][0], 1), search[i][0], undefined, delay, 1));
+                delay += 0.35;
+            }
+        } else if (enRoute === true) {
+            // yelp = yelp_api.client('rxW3uXXBPZThSA4XwqLdds0jYTjsQIzBjvTxftJBuliRFgcRe3rhfvRt7S-ZroW6PHeQvSGPJYOKLmHbsfm6dB_7pOUPgj79J9JXJchbgyH3PNhHNAn1iK5YUeRlXnYx');
             locations.forEach((location) => {
                 let distancePreferred = 2;
                 for (let i = 0; i < 3; i++) {
-                    promises.push(getRestaurants(buildQuery(userModel.price, distancePreferred, location, search[i][0]), search[i][0], undefined, delay));
-                    delay += 0.25;
+                    promises.push(getRestaurants(buildQuery(userModel.price, distancePreferred, location, search[i][0], 3), search[i][0], undefined, delay));
+                    delay += 0.35;
                 }
             });
         } else {
+            // yelp = yelp_api.client('rxW3uXXBPZThSA4XwqLdds0jYTjsQIzBjvTxftJBuliRFgcRe3rhfvRt7S-ZroW6PHeQvSGPJYOKLmHbsfm6dB_7pOUPgj79J9JXJchbgyH3PNhHNAn1iK5YUeRlXnYx');
             for (let i = 0; i < 5; i++) {
                 let subSearch = Object.entries(search[i][1].subQueries).sort((a, b) => {
                     return b - a;
@@ -232,7 +264,7 @@ async function gatherInformation(userModel, locations, enRoute) {
                     } else {
                         promises.push(getRestaurants(buildQuery(userModel.price, userModel.distancePreferred, locations, subSearch[j][0] + ' ' + search[i][0]), search[i][0], subSearch[j][0], delay));
                     }
-                    delay += 0.25;
+                    delay += 0.35;
                 }
             }
         }
@@ -268,7 +300,7 @@ function delay(t, v) {
 
 function getRestaurants(query, headQuery, subQuery, n) {
     try {
-        return delay(1000 * n)
+        return delay(1000 * (n+1))
             .then(() => {
                 return yelp.search(query);
             })
@@ -288,15 +320,28 @@ function getRestaurants(query, headQuery, subQuery, n) {
     }
 }
 
-function buildQuery(price, distancePreferred, location, query) {
-    return {
-        term: query,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        price: price,
-        open_now: true,
-        radius: Math.floor(distancePreferred * milesToMeters),
-        categories: 'restaurants',
-        limit: 4,
-    };
+function buildQuery(price, distancePreferred, location, query, num) {
+    if (num) {
+        return {
+            term: query,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            price: price,
+            open_now: true,
+            radius: Math.floor(distancePreferred * milesToMeters),
+            categories: 'restaurants',
+            limit: num,
+        };
+    } else {
+        return {
+            term: query,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            price: price,
+            open_now: true,
+            radius: Math.floor(distancePreferred * milesToMeters),
+            categories: 'restaurants',
+            limit: 4,
+        };
+    }
 }
