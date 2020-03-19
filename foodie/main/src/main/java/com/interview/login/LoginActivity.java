@@ -15,7 +15,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -31,7 +30,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
-import com.google.firebase.auth.FirebaseUser;
 import com.interview.R;
 import com.interview.RecyclerViewActivity;
 
@@ -44,7 +42,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editText_Username;
     private EditText editText_Password;
 
-    private CheckBox checkBox_KeepMeSignedIn;
     private CheckBox checkBox_ShowPassword;
 
     private Button button_Login;
@@ -70,17 +67,17 @@ public class LoginActivity extends AppCompatActivity {
         assignLayoutVariables();
 
         //TODO: remove the next line of code when ready to deploy
-        editText_Username.setText("joe@uci.edu");
+        editText_Username.setText("mauricio@uci.edu");
         editText_Password.setText("zotzot");
 
+        // If user created an account it displays the next instructions
         if (getIntent().getExtras() != null)
-        {
             textView_Indicator.setText(getIntent().getStringExtra("message"));
-        }
 
         setTextListenerRules();
     }
 
+    // Assigns the layout variables
     private void assignLayoutVariables(){
         //////  Assigned Layout Variables    //////////////////////////////
         editText_Username = (EditText) findViewById(R.id.username);
@@ -93,7 +90,6 @@ public class LoginActivity extends AppCompatActivity {
         progressBar_Loading = (ProgressBar) findViewById(R.id.loading);
         textView_Indicator = (TextView) findViewById(R.id.textView_Indicator);
         checkBox_ShowPassword = (CheckBox) findViewById(R.id.checkBox_Show_Password);
-        checkBox_KeepMeSignedIn = (CheckBox) findViewById(R.id.checkBox_Keep_Signed_In);
 
 
         //////  Assigned Backend Variables    //////////////////////////////
@@ -107,6 +103,8 @@ public class LoginActivity extends AppCompatActivity {
         };
     }
 
+    // Sets the text listener for changes in text input during the login
+    // Asserts the user if their login input is in the correct format
     private void setTextListenerRules(){
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
@@ -144,8 +142,13 @@ public class LoginActivity extends AppCompatActivity {
                         editText_Password.getText().toString());
             }
         };
+
+        // Add the listener to the text box so it displays an error message
+        // if the input isn't in the right format
         editText_Username.addTextChangedListener(afterTextChangedListener);
         editText_Password.addTextChangedListener(afterTextChangedListener);
+
+
         editText_Password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
@@ -162,28 +165,12 @@ public class LoginActivity extends AppCompatActivity {
                 editText_Password.getText().toString());
     }
 
-    private void updateUiWithUser(Task<AuthResult> authResultTask) {
-        authResultTask.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    // Sign in success, update UI with the signed-in user's information
-                    FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                    updateUI(user);
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
-                    updateUI(null);
-                }
-            }
-        });
-    }
-
+    // Displays an error message if a login fails
     private void showLoginFailed(final TextView indicator) {
         indicator.setText("username or password is incorrect");
     }
 
+    // Behavior when someone clicks the "Sign in" button
     public void onClick_SignIn(View view){
         /**
          * This is a runnable multi-threaded overriden function.
@@ -206,31 +193,25 @@ public class LoginActivity extends AppCompatActivity {
                             textView_Indicator.setText("Worked");
                             enableAllInputs(color);
                             progressBar_Loading.setVisibility(View.INVISIBLE);
-                            //TODO: success sign in. Must go to the next activity here or call updateUI
-                            //Start.NewActivity(this, Swipe.class, mFirebaseAuth.getCurrentUser());
                             startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.
                             showLoginFailed(textView_Indicator);
                             enableAllInputs(color);
                             progressBar_Loading.setVisibility(View.INVISIBLE);
-                            //TODO: failed signing in. What do you do after?
                         }
                     }
                 });
     }
 
-    private void createAccount(String username, String password){
+    // starts the create account activity
+    public void onClick_CreateNewAccount(View view){
         Intent intent = new Intent(this, CreateAccount.class);
         startActivity(intent);
         finish();
     }
 
-    public void onClick_CreateNewAccount(View view){
-        //TODO: Create an account form and Link a create account button
-        createAccount(editText_Username.getText().toString(), editText_Password.getText().toString());
-    }
-
+    // Enables the view of the password text edit to visible and disables it
     public void onClick_ShowPassword(View view){
         if (checkBox_ShowPassword.isChecked())
             editText_Password.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -240,11 +221,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    // Signs in with google's sigin in
     public void onClick_GoogleButton(View view){
-        // This works
-        if (mFirebaseAuth.getCurrentUser() != null) {
-            updateUI(mFirebaseAuth.getCurrentUser());
-        }
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -254,21 +232,7 @@ public class LoginActivity extends AppCompatActivity {
                 RC_SIGN_IN);
     }
 
-    public void onClick_KeepMeSignedIn(View view){
-        //TODO: set sign in options to stay signed in
-    }
-
-    public void updateUI(FirebaseUser user){
-        if (user != null) {
-            String welcome = getString(R.string.welcome) + user.getDisplayName();
-
-            /////////////////////////////////////////
-            // TODO : initiate the next intent here
-            /////////////////////////////////////////
-
-        }
-    }
-
+    // Disables inputs while loading
     private void disableAllInputs(){
         editText_Username.setEnabled(false);
         editText_Password.setEnabled(false);
@@ -279,9 +243,9 @@ public class LoginActivity extends AppCompatActivity {
 
         textView_Indicator.setEnabled(false);
         checkBox_ShowPassword.setEnabled(false);
-        checkBox_KeepMeSignedIn.setEnabled(false);
     }
 
+    // Enables inputs after finished loading
     private void enableAllInputs(@ColorInt int c){
         editText_Username.setEnabled(true);
         editText_Password.setEnabled(true);
@@ -294,7 +258,6 @@ public class LoginActivity extends AppCompatActivity {
         button_GoogleSignIn.setEnabled(true);
         textView_Indicator.setEnabled(true);
         checkBox_ShowPassword.setEnabled(true);
-        checkBox_KeepMeSignedIn.setEnabled(true);
     }
 
     @Override

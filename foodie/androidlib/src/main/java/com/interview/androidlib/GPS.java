@@ -95,8 +95,9 @@ public class GPS {
     public void startGPSTracking(){
         // Check if the GPS permission is available
         if (app != null) {
-            if (app.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            if (app.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            }
             else {
                 if (app.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) || app.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION))
                     Toast.makeText(app, "GPS permission is needed to view the map.", Toast.LENGTH_SHORT).show();
@@ -106,8 +107,9 @@ public class GPS {
             }
         }
         if (frag != null) {
-            if (frag.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            if (frag.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            }
             else {
                 if (frag.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) || frag.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION))
                     Toast.makeText(frag, "GPS permission is needed to view the map.", Toast.LENGTH_SHORT).show();

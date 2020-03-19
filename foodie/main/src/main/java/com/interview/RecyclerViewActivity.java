@@ -11,6 +11,9 @@ package com.interview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,12 +22,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.interview.androidlib.GPS;
 import com.interview.lib.DateTime;
 
 import org.json.JSONArray;
@@ -33,6 +38,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +50,12 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
     //////////  LAYOUT VARIABLES  //////////////////////////////////////////
     private RecyclerView recyclerView_Frame;
+    private ProgressBar progressBar_Loading;
+    BottomNavigationView bottomNavigationView;
 
     //////////  Backend Variables   ////////////////////////////////////////
     ArrayList<JSONObject> jsonList = new ArrayList<>();
 
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
     public HttpsCallableReference callable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,32 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
         //////  Layout Variables Assigned    //////////////////////////////
 
+        bottomNavigationView = findViewById(R.id.nav_view);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.navigation_home:
+                        onClick_logout();
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.navigation_dashboard:
+                        return true;
+                    case R.id.navigation_notifications:
+                        startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
         recyclerView_Frame = (RecyclerView) findViewById(R.id.recyclerViewFrame);
+        progressBar_Loading = (ProgressBar) findViewById(R.id.loadingRecycler);
+
         onCallable();
     }
 
@@ -70,9 +102,11 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
          * be signed in FIRST before continuing on, place the
          * next line of code inside the "onComplete" method
          */
+
+        progressBar_Loading.setVisibility(View.VISIBLE);
         this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
         Map<String, Object> day = new HashMap<>();
-        day.put("timeOfDay", DateTime.timeOfDayInt()); // TODO: remember 0 means breakfast
+        day.put("timeOfDay", DateTime.timeOfDayInt()); // Remember 0 means breakfast: {0: breakfast, 1: lunch, 2: dinner, 3: late snack}
         Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
 
         firebaseCall.addOnCompleteListener(this, new OnCompleteListener<HttpsCallableResult>() {
@@ -83,19 +117,43 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
                     List v = ((List) result.getData());
                     for (int i = 0; i < v.size(); i++)
                         jsonList.add(new JSONObject((Map) v.get(i)));
+
+                    sortJSONObjects(jsonList);
                     startListView();
+                    progressBar_Loading.setVisibility(View.INVISIBLE);
                 }
                 else{
-
+                    progressBar_Loading.setVisibility(View.INVISIBLE);
                 }
             }
         });
     }
 
-    private void startListView(){
-        // Initialize contacts
 
-        // Create adapter passing in the sample user data
+    // sorts the list into decending order
+    private void sortJSONObjects(ArrayList<JSONObject> list){
+        if (list.size() > 1){
+            Collections.sort(list, new Comparator<JSONObject>() {
+                @Override
+                public int compare(JSONObject o1, JSONObject o2) {
+                    try {
+                        if (Double.parseDouble(o1.getString("rating"))
+                                > Double.parseDouble(o2.getString("rating")))
+                            return -1;
+                        else
+                            return 1;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return -1;
+                }
+            });
+        }
+    }
+
+    // Starts the recycler view
+    private void startListView(){
+        // Create adapter passing in the user recommendations
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(jsonList, this);
 
         // Attach the adapter to the recyclerview to populate items
@@ -103,6 +161,10 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
         // Set layout manager to position the items
         recyclerView_Frame.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    private void onClick_logout(){
+
     }
 
     @Override
