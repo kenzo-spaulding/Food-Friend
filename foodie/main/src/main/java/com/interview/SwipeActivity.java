@@ -241,14 +241,17 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     @Override
     public void removeFirstObjectInAdapter() {
         // this is the simplest way to delete an object from the Adapter (/AdapterView)
-        str.remove(0);
-        jsonList.remove(0);
+        if (!loading) {
+            str.remove(0);
+            jsonList.remove(0);
+        }
         arrayAdapterImg.notifyDataSetChanged();
     }
 
     @Override
     public void onLeftCardExit(Object o) {
-        losers.add(str.get(i));
+        if (!loading)
+            losers.add(str.get(i));
     }
 
     @Override
@@ -276,7 +279,6 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
             onCallable();
         arrayAdapterImg.notifyDataSetChanged();
         i++;
-        onCallable();
     }
 
     @Override
