@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +60,8 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     private Button button_Like;
     private Button button_Dislike;
 
-    BottomNavigationView bottomNavigationView;
+    private BottomNavigationView bottomNavigationView;
+    private ProgressBar progressBar_Swipe;
 
 
     //////////  Backend Variables   ////////////////////////////////////////
@@ -76,6 +78,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     private ArrayList<String> str;
     ArrayList<JSONObject> jsonList;
 
+    private boolean loading = true;
     private FirebaseAuth auth;
 
 
@@ -108,6 +111,8 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         button_Like = (Button) findViewById(R.id.button_like);
         button_Dislike = (Button) findViewById(R.id.button_dislike);
 
+        progressBar_Swipe = (ProgressBar) findViewById(R.id.progressBar_Swipe);
+
         ///////////////////////////////////////////////////////////////////
 
         jsonList = new ArrayList<>();
@@ -125,7 +130,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
 
 
         bottomNavigationView = findViewById(R.id.nav_view);
-        bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_notifications);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -136,8 +141,15 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.navigation_dashboard:
-                        startActivity(new Intent(getApplicationContext(), RecyclerViewActivity.class));
-                        overridePendingTransition(0, 0);
+                        if (!loading){
+                            startActivity(new Intent(getApplicationContext(), RecyclerViewActivity.class));
+                            overridePendingTransition(0, 0);
+                        }
+                        else
+                        {
+                            String message = "Wait until the list is done loading.";
+                            Toast.makeText(SwipeActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
                     case R.id.navigation_notifications:
                         return true;
                     default:
@@ -163,6 +175,8 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
          * be signed in FIRST before continuing on, place the
          * next line of code inside the "onComplete" method
          */
+        progressBar_Swipe.setVisibility(View.VISIBLE);
+        disableAllInputs();
         this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
         Map<String, Object> day = new HashMap<>();
         day.put("timeOfDay", DateTime.timeOfDayInt());
@@ -174,6 +188,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
             public void onComplete(@NonNull Task<HttpsCallableResult> task) {
                 if (task.isSuccessful()){
                     HttpsCallableResult result = task.getResult();
+                    textView_ItemDescription.setText(result.getData().toString());
                     List v = ((List) result.getData());
                     for (int i = 0; i < v.size(); i++) {
                         JSONObject item = new JSONObject((Map) v.get(i));
@@ -184,15 +199,38 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                             e.printStackTrace();
                         }
                     }
-                    textView_ItemDescription.setText(str.toString());
+                    progressBar_Swipe.setVisibility(View.INVISIBLE);
                     i += v.size();
-                    arrayAdapterImg.notifyDataSetChanged();
+                    enableAllInputs();
+                    flingContainer.getTopCardListener().selectLeft();
                 }
                 else{
                     textView_ItemDescription.setText("No more available training data.");
+                    progressBar_Swipe.setVisibility(View.INVISIBLE);
+                    enableAllInputs();
                 }
             }
         });
+    }
+
+    private void disableAllInputs(){
+        loading = true;
+        bottomNavigationView.setEnabled(false);
+        bottomNavigationView.setFocusable(false);
+        bottomNavigationView.setFocusableInTouchMode(false);
+        bottomNavigationView.setClickable(false);
+        bottomNavigationView.setContextClickable(false);
+    }
+
+    private void enableAllInputs(){
+        loading = false;
+        bottomNavigationView.setEnabled(true);
+        bottomNavigationView.setFocusable(true);
+        bottomNavigationView.setFocusableInTouchMode(true);
+        bottomNavigationView.setClickable(true);
+        bottomNavigationView.setContextClickable(true);
+
+        bottomNavigationView.setSelectedItemId(R.id.navigation_notifications);
     }
 
     @Override
@@ -220,6 +258,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         str.add("Loading Data.");
         arrayAdapterImg.notifyDataSetChanged();
         i++;
+        onCallable();
     }
 
     @Override
@@ -228,8 +267,6 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
 
     @Override
     public void onItemClicked(int i, Object o) {
-        //TODO: Do you need to change the image when clicked/tapped?
-        textView_ItemDescription.setText(gps.getLastKnownAddress().toString());
     }
 
     public void onClick_Dislike(View view){

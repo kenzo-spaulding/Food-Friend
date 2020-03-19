@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,6 +54,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
     //////////  LAYOUT VARIABLES  //////////////////////////////////////////
     private RecyclerView recyclerView_Frame;
     private ProgressBar progressBar_Loading;
+    private boolean loading = true;
     BottomNavigationView bottomNavigationView;
 
     //////////  Backend Variables   ////////////////////////////////////////
@@ -83,8 +85,15 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
                     case R.id.navigation_dashboard:
                         return true;
                     case R.id.navigation_notifications:
-                        startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
-                        overridePendingTransition(0, 0);
+                        if (!loading) {
+                            startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
+                            overridePendingTransition(0, 0);
+                        }
+                        else
+                        {
+                            String message = "Wait until the list is done loading.";
+                            Toast.makeText(RecyclerViewActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
                         return true;
                     default:
                         return false;
@@ -108,6 +117,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
          */
 
         progressBar_Loading.setVisibility(View.VISIBLE);
+        disableAllInputs();
         this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
         Map<String, Object> day = new HashMap<>();
         day.put("timeOfDay", DateTime.timeOfDayInt()); // Remember 0 means breakfast: {0: breakfast, 1: lunch, 2: dinner, 3: late snack}
@@ -125,9 +135,11 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
                     sortJSONObjects(jsonList);
                     startListView();
                     progressBar_Loading.setVisibility(View.INVISIBLE);
+                    enableAllInputs();
                 }
                 else{
                     progressBar_Loading.setVisibility(View.INVISIBLE);
+                    enableAllInputs();
                 }
             }
         });
@@ -165,6 +177,26 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
         // Set layout manager to position the items
         recyclerView_Frame.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    private void disableAllInputs(){
+        loading = true;
+        bottomNavigationView.setEnabled(false);
+        bottomNavigationView.setFocusable(false);
+        bottomNavigationView.setFocusableInTouchMode(false);
+        bottomNavigationView.setClickable(false);
+        bottomNavigationView.setContextClickable(false);
+    }
+
+    private void enableAllInputs(){
+        loading = false;
+        bottomNavigationView.setEnabled(true);
+        bottomNavigationView.setFocusable(true);
+        bottomNavigationView.setFocusableInTouchMode(true);
+        bottomNavigationView.setClickable(true);
+        bottomNavigationView.setContextClickable(true);
+
+        bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
     }
 
     private void onClick_logout(){
