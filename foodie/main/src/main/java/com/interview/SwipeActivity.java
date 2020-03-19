@@ -31,6 +31,7 @@ import com.interview.lib.Json;
 import com.interview.login.LoginActivity;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,6 +78,8 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     private ArrayAdapter<String> arrayAdapterImg;
     private ArrayList<String> str;
     ArrayList<JSONObject> jsonList;
+    ArrayList<String> losers = new ArrayList<>();
+    JSONArray losersJson = new JSONArray();
 
     private boolean loading = true;
     private FirebaseAuth auth;
@@ -204,7 +207,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                         arrayAdapterImg.notifyDataSetChanged();
                         flingContainer.getTopCardListener().selectLeft();
                         enableAllInputs();
-                    }catch (Exception e){}
+                    }catch (Exception e){ enableAllInputs(); }
                 }
                 else{
                     textView_ItemDescription.setText("No more available training data.");
@@ -239,17 +242,28 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     public void removeFirstObjectInAdapter() {
         // this is the simplest way to delete an object from the Adapter (/AdapterView)
         str.remove(0);
+        jsonList.remove(0);
         arrayAdapterImg.notifyDataSetChanged();
     }
 
     @Override
     public void onLeftCardExit(Object o) {
-        //TODO: Log into Firebase the result
+        losers.add(str.get(i));
     }
 
     @Override
     public void onRightCardExit(Object o) {
-        //TODO: Log into Firebase the result
+        try {
+            this.callable = FirebaseFunctions.getInstance().getHttpsCallable("updateUserPrefs");
+            Map<String, Object> day = new HashMap<>();
+            day.put("timeOfDay", DateTime.timeOfDayInt());
+            day.put("winner", str.get(i));
+            day.put("loser", (new JSONArray(losers)).toString());
+            Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
+
+            losers.clear();
+        }
+        catch (Exception e) { e.printStackTrace(); }
     }
 
     @Override
