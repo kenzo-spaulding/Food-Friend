@@ -53,8 +53,8 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     private Button button_Like;
     private Button button_Dislike;
 
-
     BottomNavigationView bottomNavigationView;
+
 
     //////////  Backend Variables   ////////////////////////////////////////
     int i;

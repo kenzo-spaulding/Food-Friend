@@ -13,10 +13,12 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.interview.androidlib.DownloadImage;
 import com.interview.androidlib.GPS;
 import com.interview.lib.DateTime;
@@ -41,6 +44,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView textView_Calories;
     private TextView textView_Recommend;
     private TextView textView_Options;
+
+    BottomNavigationView bottomNavigationView;
 
 
     //////////  Backend Variables   ////////////////////////////////////////
@@ -64,10 +69,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //////////  Backend Variables Assigned  ////////////////////////////////////////
         this.gps = new GPS(this);
 
+
+        bottomNavigationView = findViewById(R.id.nav_view);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.navigation_home:
+                        onClick_logout();
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.navigation_dashboard:
+                        startActivity(new Intent(getApplicationContext(), RecyclerViewActivity.class));
+                        overridePendingTransition(0, 0);
+                    case R.id.navigation_notifications:
+                        startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragmentmap);
         mapFragment.getMapAsync(this);
+    }
+
+    private void onClick_logout(){
+
     }
 
 
