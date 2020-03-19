@@ -11,6 +11,8 @@ package com.interview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.interview.androidlib.GPS;
 import com.interview.lib.DateTime;
 
 import org.json.JSONArray;
@@ -43,6 +46,8 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
     //////////  LAYOUT VARIABLES  //////////////////////////////////////////
     private RecyclerView recyclerView_Frame;
+    private ProgressBar progressBar_Loading;
+    private GPS gps;
 
     //////////  Backend Variables   ////////////////////////////////////////
     ArrayList<JSONObject> jsonList = new ArrayList<>();
@@ -59,6 +64,8 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
         //////  Layout Variables Assigned    //////////////////////////////
 
         recyclerView_Frame = (RecyclerView) findViewById(R.id.recyclerViewFrame);
+        progressBar_Loading = (ProgressBar) findViewById(R.id.loadingRecycler);
+
         onCallable();
     }
 
@@ -70,9 +77,11 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
          * be signed in FIRST before continuing on, place the
          * next line of code inside the "onComplete" method
          */
+
+        progressBar_Loading.setVisibility(View.VISIBLE);
         this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
         Map<String, Object> day = new HashMap<>();
-        day.put("timeOfDay", DateTime.timeOfDayInt()); // TODO: remember 0 means breakfast
+        day.put("timeOfDay", DateTime.timeOfDayInt()); // Remember 0 means breakfast: {0: breakfast, 1: lunch, 2: dinner, 3: late snack}
         Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
 
         firebaseCall.addOnCompleteListener(this, new OnCompleteListener<HttpsCallableResult>() {
@@ -84,18 +93,17 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
                     for (int i = 0; i < v.size(); i++)
                         jsonList.add(new JSONObject((Map) v.get(i)));
                     startListView();
+                    progressBar_Loading.setVisibility(View.INVISIBLE);
                 }
                 else{
-
+                    progressBar_Loading.setVisibility(View.INVISIBLE);
                 }
             }
         });
     }
 
     private void startListView(){
-        // Initialize contacts
-
-        // Create adapter passing in the sample user data
+        // Create adapter passing in the user recommendations
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(jsonList, this);
 
         // Attach the adapter to the recyclerview to populate items

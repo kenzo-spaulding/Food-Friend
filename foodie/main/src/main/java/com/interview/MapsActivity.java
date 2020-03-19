@@ -28,13 +28,13 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.interview.androidlib.DownloadImage;
 import com.interview.androidlib.GPS;
+import com.interview.lib.DateTime;
 
 import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     //////////  LAYOUT VARIABLES  //////////////////////////////////////////
-    private ImageView imageView_Logo;
 
     private TextView textView_Title;
     private TextView textView_Radius;
@@ -42,7 +42,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView textView_Recommend;
     private TextView textView_Options;
 
-    private View fragment_Map;
 
     //////////  Backend Variables   ////////////////////////////////////////
     private GoogleMap mMap;
@@ -61,14 +60,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         textView_Calories = (TextView) findViewById(R.id.textView_Calories);
         textView_Recommend = (TextView) findViewById(R.id.textView_Recommend);
         textView_Options = (TextView) findViewById(R.id.textView_Options);
-        imageView_Logo = (ImageView) findViewById(R.id.imageview_CompanyLogo);
-
-        fragment_Map = (View) findViewById(R.id.fragmentmap);
 
         //////////  Backend Variables Assigned  ////////////////////////////////////////
         this.gps = new GPS(this);
-
-        setMarkerIfBundled(getIntent());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -94,10 +88,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng gpsBoundaryCoord = new LatLng(10, -154);
         LatLngBounds unitedStates = new LatLngBounds(gpsBoundaryCoord, gpsCenterCoord);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(unitedStates.getCenter(), 14));
-    }
-
-    public void setMarkerIfBundled(Intent intent){
-
     }
 
     public LatLng latlng(Address address){
@@ -162,11 +152,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 addr.setLatitude(Double.parseDouble(latitude));
                 addMarker(addr, name, snippet);
                 moveCamera(addr);
-
                 textView_Title.setText(name);
                 textView_Radius.setText(String.format("%.2f", Double.parseDouble(distance)) + " miles");
-                textView_Recommend.setText(snippet);
-                textView_Options.setText(phone);
+                textView_Recommend.setText(snippet + ((phone == null || phone.equals("")) ? "" : "," + phone));
+                textView_Options.setText(DateTime.timeOfDayString());
                 textView_Calories.setText(address1 + "\n" + address_city + ", " + zip_code);
                 textView_Recommend.setText(snippet);
 
@@ -182,6 +171,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onClick_Train(View view){
         Intent intent = new Intent(this, SwipeActivity.class);
         startActivity(intent);
+    }
+
+    public void onClick_Refresh(View view){
+        try{
+            gps.stopGPSTracking();
+            gps.startGPSTracking();
+        } catch (Exception e){  }
     }
 
     @Override
