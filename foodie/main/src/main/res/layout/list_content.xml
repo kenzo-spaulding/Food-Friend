@@ -12,30 +12,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.13541667" />
+        app:layout_constraintGuide_percent="0.02" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8854167" />
+        app:layout_constraintGuide_percent="0.98" />
+
+    <ImageView
+        android:id="@+id/imageview_Background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fadingEdge="vertical"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@+id/guideline14"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline13"
+        app:srcCompat="@drawable/ic_listview_item_background" />
 
     <FrameLayout
+        android:id="@+id/frameLayout2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toStartOf="@+id/guideline12"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline13">
-
-        <ImageView
-            android:id="@+id/imageview_Background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fadingEdge="vertical"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/ic_listview_item_background" />
 
         <ImageView
             android:id="@+id/imageview_CompanyLogo"
@@ -50,9 +55,10 @@
 
     <TextView
         android:id="@+id/textView_FoodName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="MenuItem-Food"
+        android:textAlignment="textStart"
         app:layout_constraintEnd_toStartOf="@+id/guideline11"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/guideline12"
@@ -60,9 +66,10 @@
 
     <TextView
         android:id="@+id/textView_DrinkName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="MenuItem-Drink"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/guideline11"
@@ -70,9 +77,10 @@
 
     <TextView
         android:id="@+id/textView_FoodMods"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Modifications"
+        android:textAlignment="textStart"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toStartOf="@+id/guideline11"
         app:layout_constraintHorizontal_bias="0.5"
@@ -94,9 +102,10 @@
 
     <TextView
         android:id="@+id/textView_DrinkMods"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Modifications"
+        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -104,9 +113,10 @@
 
     <TextView
         android:id="@+id/textView_FoodSize"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Food-Size"
+        android:textAlignment="textStart"
         app:layout_constraintBottom_toTopOf="@+id/textView_FoodMods"
         app:layout_constraintEnd_toStartOf="@+id/guideline11"
         app:layout_constraintStart_toStartOf="@+id/guideline12"
@@ -115,9 +125,10 @@
 
     <TextView
         android:id="@+id/textView_DrinkSize"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Drink-Size"
+        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/textView_DrinkMods"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

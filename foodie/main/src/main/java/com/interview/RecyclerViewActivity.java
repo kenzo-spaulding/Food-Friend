@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,24 +37,23 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-public class RecyclerViewActivity extends AppCompatActivity implements RecyclerViewAdapter.OnItemClickListener {
+public class RecyclerViewActivity extends Fragment implements RecyclerViewAdapter.OnItemClickListener {
 
 
     //////////  LAYOUT VARIABLES  //////////////////////////////////////////
     private RecyclerView recyclerView_Frame;
     private ProgressBar progressBar_Loading;
-    private GPS gps;
 
     //////////  Backend Variables   ////////////////////////////////////////
     ArrayList<JSONObject> jsonList = new ArrayList<>();
 
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
     public HttpsCallableReference callable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +92,8 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
                     List v = ((List) result.getData());
                     for (int i = 0; i < v.size(); i++)
                         jsonList.add(new JSONObject((Map) v.get(i)));
+
+                    sortJSONObjects(jsonList);
                     startListView();
                     progressBar_Loading.setVisibility(View.INVISIBLE);
                 }
@@ -102,6 +104,29 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
         });
     }
 
+
+    // sorts the list into decending order
+    private void sortJSONObjects(ArrayList<JSONObject> list){
+        if (list.size() > 1){
+            Collections.sort(list, new Comparator<JSONObject>() {
+                @Override
+                public int compare(JSONObject o1, JSONObject o2) {
+                    try {
+                        if (Double.parseDouble(o1.getString("rating"))
+                                > Double.parseDouble(o2.getString("rating")))
+                            return -1;
+                        else
+                            return 1;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return -1;
+                }
+            });
+        }
+    }
+
+    // Starts the recycler view
     private void startListView(){
         // Create adapter passing in the user recommendations
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(jsonList, this);
