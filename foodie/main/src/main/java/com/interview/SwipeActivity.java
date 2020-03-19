@@ -157,7 +157,6 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                 }
             }
         });
-
         onCallable();
     }
 
@@ -189,20 +188,23 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                 if (task.isSuccessful()){
                     HttpsCallableResult result = task.getResult();
                     textView_ItemDescription.setText(result.getData().toString());
-                    List v = ((List) result.getData());
-                    for (int i = 0; i < v.size(); i++) {
-                        JSONObject item = new JSONObject((Map) v.get(i));
-                        jsonList.add(item);
-                        try {
-                            str.add(item.getString("headQuery"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                    try {
+                        List v = ((List) result.getData());
+                        for (int i = 0; i < v.size(); i++) {
+                            JSONObject item = new JSONObject((Map) v.get(i));
+                            jsonList.add(item);
+                            try {
+                                str.add(item.getString("headQuery"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    progressBar_Swipe.setVisibility(View.INVISIBLE);
-                    i += v.size();
-                    enableAllInputs();
-                    flingContainer.getTopCardListener().selectLeft();
+                        progressBar_Swipe.setVisibility(View.INVISIBLE);
+                        i += v.size();
+                        arrayAdapterImg.notifyDataSetChanged();
+                        flingContainer.getTopCardListener().selectLeft();
+                        enableAllInputs();
+                    }catch (Exception e){}
                 }
                 else{
                     textView_ItemDescription.setText("No more available training data.");
@@ -255,7 +257,9 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         // Ask for more data here
         //str.add(new ImageContent("Food item: ".concat(String.valueOf(i)), "http://logo.clearbit.com/spotify.com?size=60"));
         //TODO: add additional items to the list to render before it ends
-        str.add("Loading Data.");
+        str.add("Almost there...");
+        if (!loading)
+            onCallable();
         arrayAdapterImg.notifyDataSetChanged();
         i++;
         onCallable();
