@@ -29,9 +29,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.interview.androidlib.DownloadImage;
 import com.interview.androidlib.GPS;
 import com.interview.lib.DateTime;
+import com.interview.login.LoginActivity;
 
 import java.util.Locale;
 
@@ -52,11 +55,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GPS gps;
     private Bundle bundle;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        FirebaseApp.initializeApp(this);
+        auth = FirebaseAuth.getInstance();
         bundle = getIntent().getExtras();
 
         //////  Layout Variables Assigned    //////////////////////////////
@@ -101,7 +107,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void onClick_logout(){
-
+        auth.signOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
 

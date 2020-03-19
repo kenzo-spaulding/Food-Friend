@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.functions.FirebaseFunctions;
@@ -31,6 +32,7 @@ import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.interview.androidlib.GPS;
 import com.interview.lib.DateTime;
+import com.interview.login.LoginActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,6 +57,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
 
     //////////  Backend Variables   ////////////////////////////////////////
     ArrayList<JSONObject> jsonList = new ArrayList<>();
+    private FirebaseAuth auth;
 
     public HttpsCallableReference callable;
     @Override
@@ -62,6 +65,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recycler_view);
         FirebaseApp.initializeApp(this);
+        auth = FirebaseAuth.getInstance();
 
         //////  Layout Variables Assigned    //////////////////////////////
 
@@ -164,7 +168,9 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
     }
 
     private void onClick_logout(){
-
+        auth.signOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override

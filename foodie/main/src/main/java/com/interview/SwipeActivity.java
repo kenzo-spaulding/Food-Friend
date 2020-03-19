@@ -19,11 +19,14 @@ import androidx.cardview.widget.CardView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.interview.androidlib.GPS;
 import com.interview.lib.Json;
+import com.interview.login.LoginActivity;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
 import org.json.JSONObject;
@@ -69,12 +72,16 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     private ArrayAdapter<String> arrayAdapterImg;
     private ArrayList<String> str;
 
+    private FirebaseAuth auth;
+
 
     //////////  Functions   ////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swipe);
+        FirebaseApp.initializeApp(this);
+        auth = FirebaseAuth.getInstance();
 
         //////  Layout Variables Assigned    //////////////////////////////
         assignLayoutVariables();
@@ -136,7 +143,9 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     }
 
     private void onClick_logout(){
-
+        auth.signOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     public void onCallable(){
@@ -172,11 +181,6 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                 }
             }
         });
-    }
-
-    public void onClick_ListView(View view){
-        Intent intent = new Intent(this, RecyclerViewActivity.class);
-        startActivity(intent);
     }
 
     @Override
