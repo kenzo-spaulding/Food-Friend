@@ -242,9 +242,11 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     public void removeFirstObjectInAdapter() {
         // this is the simplest way to delete an object from the Adapter (/AdapterView)
         if (!loading) {
-            str.remove(0);
             jsonList.remove(0);
         }
+
+        str.remove(0);
+        i--;
         arrayAdapterImg.notifyDataSetChanged();
     }
 
