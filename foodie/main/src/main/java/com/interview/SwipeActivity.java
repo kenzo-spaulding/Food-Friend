@@ -252,7 +252,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     @Override
     public void onLeftCardExit(Object o) {
         if (!loading)
-            losers.add(str.get(i));
+            losers.add(str.get(0));
     }
 
     @Override
@@ -261,7 +261,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
             this.callable = FirebaseFunctions.getInstance().getHttpsCallable("updateUserPrefs");
             Map<String, Object> day = new HashMap<>();
             day.put("timeOfDay", DateTime.timeOfDayInt());
-            day.put("winner", str.get(i));
+            day.put("winner", str.get(0));
             day.put("loser", (new JSONArray(losers)).toString());
             Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
 
