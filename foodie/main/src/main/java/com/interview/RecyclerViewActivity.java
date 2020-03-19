@@ -59,7 +59,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecyclerV
     ArrayList<JSONObject> jsonList = new ArrayList<>();
     private FirebaseAuth auth;
 
-    public HttpsCallableReference callable;
+    private HttpsCallableReference callable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -25,10 +25,12 @@ import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.interview.androidlib.GPS;
+import com.interview.lib.DateTime;
 import com.interview.lib.Json;
 import com.interview.login.LoginActivity;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapterView.onFlingListener,
@@ -71,6 +74,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
 
     private ArrayAdapter<String> arrayAdapterImg;
     private ArrayList<String> str;
+    ArrayList<JSONObject> jsonList;
 
     private FirebaseAuth auth;
 
@@ -106,7 +110,8 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
 
         ///////////////////////////////////////////////////////////////////
 
-        str = new ArrayList<>(Arrays.asList("chicken", "beef", "salad", "soup"));
+        jsonList = new ArrayList<>();
+        str = new ArrayList<>(Arrays.asList("Loading Data"));
         arrayAdapterImg = new ArrayAdapter<>(this, R.layout.item_card, R.id.textView_card, str);
 
         gps = new GPS(this);
@@ -140,6 +145,8 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
                 }
             }
         });
+
+        onCallable();
     }
 
     private void onClick_logout(){
@@ -158,7 +165,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
          */
         this.callable = FirebaseFunctions.getInstance().getHttpsCallable("recommendations");
         Map<String, Object> day = new HashMap<>();
-        day.put("timeOfDay", 0); // TODO: remember 0 means breakfast
+        day.put("timeOfDay", DateTime.timeOfDayInt());
         day.put("training", true);
         Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
 
@@ -167,17 +174,22 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
             public void onComplete(@NonNull Task<HttpsCallableResult> task) {
                 if (task.isSuccessful()){
                     HttpsCallableResult result = task.getResult();
-                    JSONObject jsonObject = Json.fromObject(result.getData());
-
-                    textView_ItemDescription.setText(jsonObject.toString());
-
-                    //textView_ItemDescription.setText(description);
-                    //textView_ItemName.setText(restaurantName);
-                    //textView_Question.setText(question);
-                    //textView_ItemDescription.setText(data.toString());
+                    List v = ((List) result.getData());
+                    for (int i = 0; i < v.size(); i++) {
+                        JSONObject item = new JSONObject((Map) v.get(i));
+                        jsonList.add(item);
+                        try {
+                            str.add(item.getString("headQuery"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    textView_ItemDescription.setText(str.toString());
+                    i += v.size();
+                    arrayAdapterImg.notifyDataSetChanged();
                 }
                 else{
-                    textView_ItemDescription.setText("Failed");
+                    textView_ItemDescription.setText("No more available training data.");
                 }
             }
         });
@@ -205,7 +217,7 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         // Ask for more data here
         //str.add(new ImageContent("Food item: ".concat(String.valueOf(i)), "http://logo.clearbit.com/spotify.com?size=60"));
         //TODO: add additional items to the list to render before it ends
-        str.add("ended");
+        str.add("Loading Data.");
         arrayAdapterImg.notifyDataSetChanged();
         i++;
     }
@@ -221,12 +233,12 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     }
 
     public void onClick_Dislike(View view){
-        if (str.size() > 0 &&flingContainer != null && flingContainer.getTopCardListener() != null)
+        if (flingContainer != null && flingContainer.getTopCardListener() != null && str != null && str.size() > 0)
                 flingContainer.getTopCardListener().selectLeft();
     }
 
     public void onClick_Like(View view){
-        if (str.size() > 0 && flingContainer != null && flingContainer.getTopCardListener() != null)
+        if (flingContainer != null && flingContainer.getTopCardListener() != null && str != null && str.size() > 0)
                 flingContainer.getTopCardListener().selectRight();
     }
 

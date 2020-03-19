@@ -28,15 +28,25 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableReference;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.interview.androidlib.DownloadImage;
 import com.interview.androidlib.GPS;
 import com.interview.lib.DateTime;
 import com.interview.login.LoginActivity;
 
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
@@ -56,6 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GPS gps;
     private Bundle bundle;
     private FirebaseAuth auth;
+    private HttpsCallableReference callable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String city = (address == null) ? "Current Location" : "Current Location in " + address.getLocality();
         if (bundle != null){
             try {
+                onCallable(address.getLatitude(), address.getLongitude());
                 Intent intent = getIntent();
                 String longitude = intent.getStringExtra("longitude");
                 String latitude = intent.getStringExtra("latitude");
@@ -203,6 +215,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             } catch (Exception e) {e.printStackTrace();}
         }
+    }
+
+    public void onCallable(double latitude, double longitude){
+        /**
+         * This is a runnable multi-threaded overriden function.
+         * If you run something outside this, its not guaranteed
+         * you're signed in until its completed. If you must
+         * be signed in FIRST before continuing on, place the
+         * next line of code inside the "onComplete" method
+         */
+        this.callable = FirebaseFunctions.getInstance().getHttpsCallable("updateUserLocation");
+        Map<String, Object> day = new HashMap<>();
+        day.put("latitude", Double.toString(latitude));
+        day.put("longitude", Double.toString(longitude));
+        Task<HttpsCallableResult> firebaseCall = this.callable.call(day);
     }
 
     public void onClick_Go(View view){
