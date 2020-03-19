@@ -15,7 +15,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -31,8 +30,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
-import com.google.firebase.auth.FirebaseUser;
-import com.interview.MenuActivity;
 import com.interview.R;
 import com.interview.RecyclerViewActivity;
 
@@ -184,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
          */
         progressBar_Loading.setVisibility(View.VISIBLE);
         @ColorInt final int color = Color.rgb(124, 124, 135);
-        final Intent intent = new Intent(this, MenuActivity.class);
+        final Intent intent = new Intent(this, RecyclerViewActivity.class);
         disableAllInputs();
         mFirebaseAuth.signInWithEmailAndPassword(editText_Username.getText().toString(),
                 editText_Password.getText().toString())

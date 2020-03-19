@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,6 +18,7 @@ import androidx.cardview.widget.CardView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.functions.HttpsCallableResult;
@@ -50,6 +52,9 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
     private Button button_Info;
     private Button button_Like;
     private Button button_Dislike;
+
+
+    BottomNavigationView bottomNavigationView;
 
     //////////  Backend Variables   ////////////////////////////////////////
     int i;
@@ -105,6 +110,33 @@ public class SwipeActivity extends AppCompatActivity implements SwipeFlingAdapte
         flingContainer.setAdapter(arrayAdapterImg);
         flingContainer.setFlingListener(this);
         flingContainer.setOnItemClickListener(this);
+
+
+        bottomNavigationView = findViewById(R.id.nav_view);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.navigation_home:
+                        onClick_logout();
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.navigation_dashboard:
+                        startActivity(new Intent(getApplicationContext(), RecyclerViewActivity.class));
+                        overridePendingTransition(0, 0);
+                    case R.id.navigation_notifications:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+    }
+
+    private void onClick_logout(){
+
     }
 
     public void onCallable(){

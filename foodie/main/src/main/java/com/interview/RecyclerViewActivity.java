@@ -11,17 +11,18 @@ package com.interview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -44,12 +45,13 @@ import java.util.List;
 import java.util.Map;
 
 
-public class RecyclerViewActivity extends Fragment implements RecyclerViewAdapter.OnItemClickListener {
+public class RecyclerViewActivity extends AppCompatActivity implements RecyclerViewAdapter.OnItemClickListener {
 
 
     //////////  LAYOUT VARIABLES  //////////////////////////////////////////
     private RecyclerView recyclerView_Frame;
     private ProgressBar progressBar_Loading;
+    BottomNavigationView bottomNavigationView;
 
     //////////  Backend Variables   ////////////////////////////////////////
     ArrayList<JSONObject> jsonList = new ArrayList<>();
@@ -62,6 +64,29 @@ public class RecyclerViewActivity extends Fragment implements RecyclerViewAdapte
         FirebaseApp.initializeApp(this);
 
         //////  Layout Variables Assigned    //////////////////////////////
+
+        bottomNavigationView = findViewById(R.id.nav_view);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.navigation_home:
+                        onClick_logout();
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.navigation_dashboard:
+                        return true;
+                    case R.id.navigation_notifications:
+                        startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
 
         recyclerView_Frame = (RecyclerView) findViewById(R.id.recyclerViewFrame);
         progressBar_Loading = (ProgressBar) findViewById(R.id.loadingRecycler);
@@ -136,6 +161,10 @@ public class RecyclerViewActivity extends Fragment implements RecyclerViewAdapte
 
         // Set layout manager to position the items
         recyclerView_Frame.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    private void onClick_logout(){
+
     }
 
     @Override
